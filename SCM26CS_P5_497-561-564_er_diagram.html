@@ -1,0 +1,153 @@
+
+<style>
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+#erd{padding:1rem 0;}
+#erd svg{width:100%;height:auto;}
+</style>
+<h2 class="sr-only">ER diagram for P5 Centralized SCM Monitoring — tables: Company, Warehouse, Product, Inventory, Orders, OrderItems, Supplier, ProcurementOrder, Delivery, DemandForecast.</h2>
+<div id="erd"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#2a2864' : '#EEEDFE',
+    primaryBorderColor: dark ? '#534AB7' : '#534AB7',
+    primaryTextColor: dark ? '#c2c0b6' : '#26215C',
+    secondaryColor: dark ? '#083028' : '#E1F5EE',
+    secondaryBorderColor: dark ? '#0F6E56' : '#0F6E56',
+    tertiaryColor: dark ? '#3d2a0a' : '#FAEEDA',
+    tertiaryBorderColor: dark ? '#854F0B' : '#854F0B',
+  },
+  er: { diagramPadding: 24, layoutDirection: 'TB', minEntityWidth: 100, minEntityHeight: 75, entityPadding: 15 }
+});
+
+const diagram = `erDiagram
+  COMPANY {
+    int company_id PK
+    string company_name
+    string region
+    string contact_email
+  }
+  WAREHOUSE {
+    int warehouse_id PK
+    int company_id FK
+    string location
+    string region
+    int capacity_units
+  }
+  PRODUCT {
+    int product_id PK
+    string product_name
+    string category
+    string unit
+    float unit_price
+  }
+  INVENTORY {
+    int inventory_id PK
+    int warehouse_id FK
+    int product_id FK
+    int current_stock
+    int reorder_point
+    date last_updated
+  }
+  SUPPLIER {
+    int supplier_id PK
+    string supplier_name
+    string contact
+    string region
+    float performance_score
+  }
+  PROCUREMENT_ORDER {
+    int proc_order_id PK
+    int supplier_id FK
+    int product_id FK
+    int quantity
+    float total_cost
+    date order_date
+    date expected_date
+    string status
+  }
+  ORDERS {
+    int order_id PK
+    int company_id FK
+    int warehouse_id FK
+    date order_date
+    string status
+    float total_value
+  }
+  ORDER_ITEMS {
+    int item_id PK
+    int order_id FK
+    int product_id FK
+    int quantity
+    float unit_price
+  }
+  DELIVERY {
+    int delivery_id PK
+    int order_id FK
+    date scheduled_date
+    date actual_date
+    string carrier
+    string status
+  }
+  DEMAND_FORECAST {
+    int forecast_id PK
+    int product_id FK
+    int warehouse_id FK
+    date forecast_month
+    int forecasted_units
+    int actual_units
+    string model_used
+  }
+
+  COMPANY ||--o{ WAREHOUSE : "operates"
+  COMPANY ||--o{ ORDERS : "places"
+  WAREHOUSE ||--o{ INVENTORY : "holds"
+  PRODUCT ||--o{ INVENTORY : "tracked in"
+  SUPPLIER ||--o{ PROCUREMENT_ORDER : "fulfils"
+  PRODUCT ||--o{ PROCUREMENT_ORDER : "ordered as"
+  ORDERS ||--o{ ORDER_ITEMS : "contains"
+  PRODUCT ||--o{ ORDER_ITEMS : "included in"
+  ORDERS ||--|| DELIVERY : "dispatched via"
+  ORDERS }o--|| WAREHOUSE : "shipped from"
+  PRODUCT ||--o{ DEMAND_FORECAST : "forecast for"
+  WAREHOUSE ||--o{ DEMAND_FORECAST : "at location"
+`;
+
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill','stroke','stroke-width','class','style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd svg .row-rect-odd path, #erd svg .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>

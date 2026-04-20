@@ -1,0 +1,31 @@
+product_name,forecast_month,forecasted_units,model_used,mape_pct
+Laptop Pro X (Electronics),2026-05-01,230,"ARIMA(2, 2, 0)",5.33
+Laptop Pro X (Electronics),2026-06-01,235,"ARIMA(2, 2, 0)",5.33
+Laptop Pro X (Electronics),2026-07-01,240,"ARIMA(2, 2, 0)",5.33
+Laptop Pro X (Electronics),2026-08-01,245,"ARIMA(2, 2, 0)",5.33
+Laptop Pro X (Electronics),2026-09-01,250,"ARIMA(2, 2, 0)",5.33
+Laptop Pro X (Electronics),2026-10-01,255,"ARIMA(2, 2, 0)",5.33
+Steel Sheets (Raw Materials),2026-05-01,401,"ARIMA(2, 2, 1)",3.77
+Steel Sheets (Raw Materials),2026-06-01,410,"ARIMA(2, 2, 1)",3.77
+Steel Sheets (Raw Materials),2026-07-01,415,"ARIMA(2, 2, 1)",3.77
+Steel Sheets (Raw Materials),2026-08-01,418,"ARIMA(2, 2, 1)",3.77
+Steel Sheets (Raw Materials),2026-09-01,425,"ARIMA(2, 2, 1)",3.77
+Steel Sheets (Raw Materials),2026-10-01,431,"ARIMA(2, 2, 1)",3.77
+Copper Wire (Raw Materials),2026-05-01,264,"ARIMA(0, 2, 2)",2.58
+Copper Wire (Raw Materials),2026-06-01,268,"ARIMA(0, 2, 2)",2.58
+Copper Wire (Raw Materials),2026-07-01,273,"ARIMA(0, 2, 2)",2.58
+Copper Wire (Raw Materials),2026-08-01,277,"ARIMA(0, 2, 2)",2.58
+Copper Wire (Raw Materials),2026-09-01,281,"ARIMA(0, 2, 2)",2.58
+Copper Wire (Raw Materials),2026-10-01,286,"ARIMA(0, 2, 2)",2.58
+Rice 5kg Pack (FMCG),2026-05-01,629,"ARIMA(0, 2, 2)",1.25
+Rice 5kg Pack (FMCG),2026-06-01,638,"ARIMA(0, 2, 2)",1.25
+Rice 5kg Pack (FMCG),2026-07-01,647,"ARIMA(0, 2, 2)",1.25
+Rice 5kg Pack (FMCG),2026-08-01,656,"ARIMA(0, 2, 2)",1.25
+Rice 5kg Pack (FMCG),2026-09-01,666,"ARIMA(0, 2, 2)",1.25
+Rice 5kg Pack (FMCG),2026-10-01,675,"ARIMA(0, 2, 2)",1.25
+Cardboard Box (Packaging),2026-05-01,209,"ARIMA(0, 2, 3)",2.59
+Cardboard Box (Packaging),2026-06-01,212,"ARIMA(0, 2, 3)",2.59
+Cardboard Box (Packaging),2026-07-01,216,"ARIMA(0, 2, 3)",2.59
+Cardboard Box (Packaging),2026-08-01,220,"ARIMA(0, 2, 3)",2.59
+Cardboard Box (Packaging),2026-09-01,223,"ARIMA(0, 2, 3)",2.59
+Cardboard Box (Packaging),2026-10-01,227,"ARIMA(0, 2, 3)",2.59

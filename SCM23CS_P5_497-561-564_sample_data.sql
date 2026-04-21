@@ -305,6 +305,40 @@ INSERT INTO DEMAND_FORECAST VALUES
 (21, 4, 1, '2026-05-01', 2800, NULL, 'ARIMA(1,1,0)'),
 (22, 4, 1, '2026-06-01', 3100, NULL, 'ARIMA(1,1,0)');
 
+-- SQL INSERT for DEMAND_FORECAST table
+-- Paste these rows after your existing INSERT statements
+
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (1, 1, '2026-05-01', 230, NULL, 'ARIMA(2, 2, 0)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (1, 1, '2026-06-01', 235, NULL, 'ARIMA(2, 2, 0)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (1, 1, '2026-07-01', 240, NULL, 'ARIMA(2, 2, 0)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (1, 1, '2026-08-01', 245, NULL, 'ARIMA(2, 2, 0)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (1, 1, '2026-09-01', 250, NULL, 'ARIMA(2, 2, 0)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (1, 1, '2026-10-01', 255, NULL, 'ARIMA(2, 2, 0)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (4, 3, '2026-05-01', 401, NULL, 'ARIMA(2, 2, 1)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (4, 3, '2026-06-01', 410, NULL, 'ARIMA(2, 2, 1)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (4, 3, '2026-07-01', 415, NULL, 'ARIMA(2, 2, 1)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (4, 3, '2026-08-01', 418, NULL, 'ARIMA(2, 2, 1)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (4, 3, '2026-09-01', 425, NULL, 'ARIMA(2, 2, 1)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (4, 3, '2026-10-01', 431, NULL, 'ARIMA(2, 2, 1)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (6, 3, '2026-05-01', 264, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (6, 3, '2026-06-01', 268, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (6, 3, '2026-07-01', 273, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (6, 3, '2026-08-01', 277, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (6, 3, '2026-09-01', 281, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (6, 3, '2026-10-01', 286, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (8, 5, '2026-05-01', 629, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (8, 5, '2026-06-01', 638, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (8, 5, '2026-07-01', 647, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (8, 5, '2026-08-01', 656, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (8, 5, '2026-09-01', 666, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (8, 5, '2026-10-01', 675, NULL, 'ARIMA(0, 2, 2)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (11, 7, '2026-05-01', 209, NULL, 'ARIMA(0, 2, 3)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (11, 7, '2026-06-01', 212, NULL, 'ARIMA(0, 2, 3)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (11, 7, '2026-07-01', 216, NULL, 'ARIMA(0, 2, 3)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (11, 7, '2026-08-01', 220, NULL, 'ARIMA(0, 2, 3)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (11, 7, '2026-09-01', 223, NULL, 'ARIMA(0, 2, 3)');
+INSERT INTO DEMAND_FORECAST (product_id, warehouse_id, forecast_month, forecasted_units, actual_units, model_used) VALUES (11, 7, '2026-10-01', 227, NULL, 'ARIMA(0, 2, 3)');
+
 -- ─── USEFUL ANALYTICAL QUERIES ───────────────────────────────
 
 -- 1. KPI: On-Time Delivery Rate

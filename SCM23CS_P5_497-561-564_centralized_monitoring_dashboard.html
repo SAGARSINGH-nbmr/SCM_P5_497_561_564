@@ -1,256 +1,1311 @@
-
-<h2 class="sr-only">P5 Centralized Monitoring SCM Dashboard — showing KPIs, inventory, order status, cost trends, and ML demand forecast for SupplyNex Pvt Ltd.</h2>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SupplyNex — SCM Decision Intelligence System</title>
 <style>
-  .scm-root { font-family: var(--font-sans); padding: 1rem 0; }
-  .scm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 8px; }
-  .scm-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
-  .scm-sub { font-size: 13px; color: var(--color-text-secondary); margin: 2px 0 0; }
-  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-  .badge-live { background: #EAF3DE; color: #3B6D11; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-  .kpi-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.9rem 1rem; }
-  .kpi-label { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 4px; }
-  .kpi-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
-  .kpi-delta { font-size: 11px; margin: 3px 0 0; }
-  .kpi-up { color: #3B6D11; }
-  .kpi-down { color: #A32D2D; }
-  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: none; margin: 0 0 10px; letter-spacing: 0.02em; }
-  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1.5rem; }
-  .chart-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
-  .chart-card.full { grid-column: 1 / -1; }
-  .legend-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; font-size: 12px; color: var(--color-text-secondary); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 4px; }
-  .filter-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
-  .filter-label { font-size: 13px; color: var(--color-text-secondary); }
-  select { font-size: 13px; padding: 5px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
-  .status-table { width: 100%; font-size: 13px; border-collapse: collapse; }
-  .status-table th { text-align: left; font-weight: 500; color: var(--color-text-secondary); font-size: 12px; padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
-  .status-table td { padding: 8px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
-  .pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .pill-ok { background: #EAF3DE; color: #3B6D11; }
-  .pill-warn { background: #FAEEDA; color: #854F0B; }
-  .pill-crit { background: #FCEBEB; color: #A32D2D; }
-  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1rem; }
-  @media (max-width: 600px) {
-    .charts-row, .bottom-row { grid-template-columns: 1fr; }
-    .chart-card.full { grid-column: 1; }
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f0f2f7; --card: #ffffff; --border: #e2e8f0;
+  --text: #1a202c; --muted: #64748b;
+  --green: #16a34a; --red: #dc2626; --amber: #d97706; --blue: #2563eb; --purple: #7c3aed; --cyan: #0891b2;
+  --green-bg: #dcfce7; --red-bg: #fee2e2; --amber-bg: #fef3c7; --blue-bg: #dbeafe; --purple-bg: #ede9fe;
+  --green-text: #15803d; --red-text: #b91c1c; --amber-text: #92400e; --blue-text: #1d4ed8; --purple-text: #5b21b6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+}
+body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+.dashboard { max-width:1300px; margin:0 auto; padding:24px 20px; }
+
+/* ── HEADER ── */
+.header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
+.header-left h1 { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+.header-left p { font-size:12px; color:var(--muted); margin-top:3px; }
+.header-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.badge-live { background:var(--green-bg); color:var(--green-text); font-size:11px; padding:5px 13px; border-radius:20px; font-weight:700; animation:pulse 2s infinite; }
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.hdr-btn { font-size:11px; padding:5px 12px; border-radius:20px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; font-weight:600; transition:all 0.2s; }
+.hdr-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+
+/* ── EXECUTIVE SUMMARY BAND ── */
+.exec-band { background:linear-gradient(135deg,#0f172a,#1e3a5f); border-radius:12px; padding:14px 20px; margin-bottom:16px; }
+.exec-inner { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+.exec-label { color:#63b3ed; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap; padding-top:2px; }
+.exec-insights { display:flex; flex-wrap:wrap; gap:8px; flex:1; }
+.exec-insight { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:5px 12px; font-size:11px; color:#e2e8f0; line-height:1.4; }
+.exec-insight.red { border-color:rgba(220,38,38,0.5); background:rgba(220,38,38,0.15); }
+.exec-insight.amber { border-color:rgba(217,119,6,0.5); background:rgba(217,119,6,0.12); }
+.exec-insight.green { border-color:rgba(22,163,74,0.5); background:rgba(22,163,74,0.12); }
+
+/* ── TOP 3 ACTIONS ── */
+.top3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+@media(max-width:700px){.top3-grid{grid-template-columns:1fr;}}
+.top3-card { border-radius:10px; padding:14px 16px; border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow); cursor:pointer; transition:all 0.2s; }
+.top3-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+.top3-rank { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+.top3-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+.top3-impact { font-size:11px; color:var(--red-text); font-weight:700; margin-top:6px; }
+.score-pill { font-size:10px; padding:2px 8px; border-radius:20px; font-weight:800; }
+.score-crit { background:var(--red-bg); color:var(--red-text); }
+.score-high { background:var(--amber-bg); color:var(--amber-text); }
+.score-med { background:var(--blue-bg); color:var(--blue-text); }
+
+/* ── FILTERS ── */
+.filters { display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 16px; margin-bottom:16px; box-shadow:var(--shadow); }
+.filters label { font-size:12px; color:var(--muted); font-weight:700; }
+.filters select { font-size:12px; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; outline:none; }
+
+/* ── KPI GRID ── */
+.kpi-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:16px; }
+@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:500px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; cursor:pointer; transition:all 0.2s; position:relative; box-shadow:var(--shadow); }
+.kpi-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+.kpi-card.status-good { border-left:3px solid var(--green); }
+.kpi-card.status-warn { border-left:3px solid var(--amber); }
+.kpi-card.status-crit { border-left:3px solid var(--red); }
+.kpi-label { font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:5px; }
+.kpi-value { font-size:22px; font-weight:800; line-height:1.1; }
+.kpi-delta { font-size:10px; margin-top:3px; }
+.kpi-benchmark { font-size:10px; margin-top:4px; padding:2px 6px; border-radius:4px; display:inline-block; font-weight:600; }
+.kpi-tooltip { position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#1a202c; color:#fff; font-size:11px; padding:6px 10px; border-radius:6px; width:190px; text-align:center; pointer-events:none; opacity:0; transition:opacity 0.2s; z-index:100; line-height:1.4; }
+.kpi-card:hover .kpi-tooltip { opacity:1; }
+.up { color:var(--green-text); } .down { color:var(--red-text); }
+
+/* ── LAYOUT ── */
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.row3 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:720px){.row2,.row3{grid-template-columns:1fr;}}
+.full-row { margin-bottom:16px; }
+
+/* ── CARD ── */
+.card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 18px; box-shadow:var(--shadow); }
+.card-title { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.legend { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; font-size:11px; color:var(--muted); }
+.ldot { width:10px; height:10px; border-radius:2px; display:inline-block; margin-right:4px; vertical-align:middle; }
+
+/* ── AI SECTION ── */
+.ai-section { background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:var(--shadow-md); }
+.ai-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.ai-header h2 { color:#fff; font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; }
+.ai-badge { background:rgba(99,179,237,0.2); color:#63b3ed; font-size:10px; padding:3px 10px; border-radius:20px; font-weight:700; border:1px solid rgba(99,179,237,0.3); }
+.ai-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; }
+.ai-card { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px 14px; transition:all 0.2s; }
+.ai-card-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+.ai-icon { font-size:16px; }
+.ai-priority { font-size:9px; font-weight:800; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; }
+.ai-priority.p-critical { background:rgba(220,38,38,0.3); color:#fc8181; border:1px solid rgba(220,38,38,0.4); }
+.ai-priority.p-high { background:rgba(217,119,6,0.3); color:#fbbf24; border:1px solid rgba(217,119,6,0.4); }
+.ai-priority.p-medium { background:rgba(37,99,235,0.3); color:#93c5fd; border:1px solid rgba(37,99,235,0.4); }
+.ai-score-badge { font-size:9px; padding:2px 7px; border-radius:20px; background:rgba(255,255,255,0.1); color:#cbd5e1; font-weight:700; }
+.ai-title { color:#e2e8f0; font-size:12px; font-weight:700; }
+.ai-desc { color:#94a3b8; font-size:11px; line-height:1.5; margin-top:4px; }
+.ai-financial { color:#fbbf24; font-size:10px; font-weight:700; margin-top:6px; }
+.ai-action { margin-top:6px; color:#63b3ed; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
+
+/* ── SUPPLY CHAIN FLOW ── */
+.flow-container { display:flex; align-items:stretch; gap:0; overflow-x:auto; padding:4px 0 8px; }
+.flow-node { flex:1; min-width:150px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center; position:relative; }
+.flow-node.delay-high { border-color:var(--red); background:var(--red-bg); }
+.flow-node.delay-med { border-color:var(--amber); background:var(--amber-bg); }
+.flow-node.delay-none { border-color:var(--green); background:var(--green-bg); }
+.flow-node-icon { font-size:22px; margin-bottom:4px; }
+.flow-node-label { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; color:var(--muted); }
+.flow-node-inv { font-size:18px; font-weight:800; }
+.flow-node-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.flow-node-delay { font-size:10px; font-weight:700; margin-top:6px; padding:2px 8px; border-radius:20px; display:inline-block; }
+.flow-arrow { display:flex; align-items:center; padding:0 4px; flex-shrink:0; }
+.flow-arrow-inner { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.flow-arrow-line { width:40px; height:2px; position:relative; }
+.flow-arrow-label { font-size:9px; color:var(--muted); font-weight:600; white-space:nowrap; }
+.flow-arrow-dot { position:absolute; right:-4px; top:-4px; width:8px; height:8px; border-radius:50%; }
+
+/* ── SCENARIO PANEL ── */
+.scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:700px){.scenario-grid{grid-template-columns:1fr;}}
+.slider-group { margin-bottom:14px; }
+.slider-label { display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:6px; }
+.slider-val { color:var(--blue); font-weight:800; }
+input[type=range] { width:100%; accent-color:var(--blue); cursor:pointer; }
+.scenario-compare { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.sc-col { padding:10px 12px; border-radius:8px; }
+.sc-col.before { background:var(--bg); border:1px solid var(--border); }
+.sc-col.after { background:var(--blue-bg); border:1px solid #93c5fd; }
+.sc-col-header { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:8px; }
+.sc-metric { display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:3px 0; border-bottom:1px solid var(--border); }
+.sc-metric:last-child { border-bottom:none; }
+.sc-metric-label { color:var(--muted); }
+.sc-metric-val { font-weight:700; }
+
+/* ── LEAD TIME TABLE ── */
+.stock-table { width:100%; font-size:11px; border-collapse:collapse; }
+.stock-table th { text-align:left; font-weight:700; color:var(--muted); font-size:10px; text-transform:uppercase; padding:5px 6px; border-bottom:1px solid var(--border); }
+.stock-table td { padding:6px 6px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.stock-table tr:last-child td { border-bottom:none; }
+.pill { font-size:10px; padding:2px 8px; border-radius:20px; font-weight:700; }
+.pill-ok { background:var(--green-bg); color:var(--green-text); }
+.pill-warn { background:var(--amber-bg); color:var(--amber-text); }
+.pill-crit { background:var(--red-bg); color:var(--red-text); }
+
+/* ── DEMAND SUPPLY GAP ── */
+.gap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+@media(max-width:600px){.gap-grid{grid-template-columns:1fr;}}
+.gap-item { padding:10px 12px; border-radius:8px; border:1px solid var(--border); }
+.gap-item-label { font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase; margin-bottom:4px; }
+.gap-item-value { font-size:18px; font-weight:800; }
+.gap-item-sub { font-size:10px; margin-top:2px; color:var(--muted); }
+.gap-overstock { background:#fff7ed; border-color:#fed7aa; }
+.gap-overstock .gap-item-value { color:var(--amber); }
+.gap-understock { background:var(--red-bg); border-color:#fca5a5; }
+.gap-understock .gap-item-value { color:var(--red); }
+.gap-ok { background:var(--green-bg); border-color:#86efac; }
+.gap-ok .gap-item-value { color:var(--green); }
+.sku-gap-table { width:100%; font-size:11px; border-collapse:collapse; }
+.sku-gap-table th { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; padding:5px 8px; border-bottom:1px solid var(--border); text-align:left; }
+.sku-gap-table td { padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.sku-gap-table tr:last-child td { border-bottom:none; }
+
+/* ── SUPPLIER ── */
+.supplier-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:600px){.supplier-grid{grid-template-columns:1fr;}}
+.supplier-row { padding:10px 12px; border-radius:8px; border:1px solid var(--border); cursor:pointer; transition:all 0.2s; }
+.supplier-row:hover { border-color:var(--blue); background:var(--blue-bg); }
+.supplier-row.worst { border-color:var(--red); background:var(--red-bg); }
+.supplier-name { font-size:12px; font-weight:700; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; }
+.supplier-rank { font-size:10px; background:var(--bg); padding:1px 6px; border-radius:4px; color:var(--muted); font-weight:700; }
+.supplier-bars { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px; }
+.mini-bar-row { display:flex; align-items:center; gap:5px; font-size:10px; color:var(--muted); }
+.mini-bar-track { flex:1; height:4px; background:var(--border); border-radius:2px; }
+.mini-bar-fill { height:100%; border-radius:2px; transition:width 0.5s; }
+.risk-badge { font-size:9px; padding:2px 7px; border-radius:20px; font-weight:700; }
+.risk-low { background:var(--green-bg); color:var(--green-text); }
+.risk-med { background:var(--amber-bg); color:var(--amber-text); }
+.risk-high { background:var(--red-bg); color:var(--red-text); }
+.supplier-switch { font-size:10px; color:var(--green-text); font-weight:700; margin-top:6px; background:var(--green-bg); padding:4px 8px; border-radius:6px; }
+.supplier-warn { font-size:10px; color:var(--red-text); font-weight:700; margin-top:6px; }
+
+/* ── ROOT CAUSE ── */
+.delay-bars { display:flex; flex-direction:column; gap:10px; }
+.delay-row { display:flex; align-items:center; gap:10px; font-size:12px; }
+.delay-label { width:130px; flex-shrink:0; color:var(--text); font-weight:600; }
+.delay-track { flex:1; height:10px; background:var(--border); border-radius:5px; overflow:hidden; }
+.delay-fill { height:100%; border-radius:5px; transition:width 0.6s ease; }
+.delay-pct { font-size:11px; font-weight:700; color:var(--muted); width:35px; text-align:right; }
+.rc-insight { margin-top:12px; padding:10px 12px; background:var(--bg); border-radius:8px; font-size:11px; line-height:1.6; color:var(--text); }
+.rc-insight strong { color:var(--red-text); }
+
+/* ── FORECAST RELIABILITY ── */
+.vol-badge { display:inline-block; font-size:9px; padding:2px 8px; border-radius:20px; font-weight:800; margin-left:6px; }
+.vol-high { background:var(--red-bg); color:var(--red-text); }
+.vol-med { background:var(--amber-bg); color:var(--amber-text); }
+.vol-low { background:var(--green-bg); color:var(--green-text); }
+
+/* ── COST ── */
+.cost-legend { display:flex; flex-direction:column; gap:8px; }
+.cost-legend-item { display:flex; align-items:center; gap:8px; font-size:11px; }
+.cost-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.cost-name { color:var(--muted); flex:1; }
+.cost-val { font-weight:700; }
+
+/* ── EVENT LOG ── */
+.event-log { height:160px; overflow-y:auto; }
+.event-item { display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); font-size:11px; }
+.event-item:last-child { border-bottom:none; }
+.event-time { color:var(--muted); white-space:nowrap; font-size:10px; font-variant-numeric:tabular-nums; }
+.event-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:2px; }
+.event-msg { color:var(--text); line-height:1.4; }
+.ev-ok { background:var(--green); } .ev-warn { background:var(--amber); } .ev-crit { background:var(--red); }
+
+/* ── MODAL ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; display:none; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--card); border-radius:12px; padding:24px; max-width:520px; width:90%; box-shadow:var(--shadow-md); max-height:80vh; overflow-y:auto; }
+.modal h3 { font-size:15px; font-weight:800; margin-bottom:4px; }
+.modal .modal-sub { font-size:12px; color:var(--muted); margin-bottom:16px; }
+.modal-close { float:right; font-size:18px; cursor:pointer; color:var(--muted); line-height:1; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.detail-item { padding:10px; background:var(--bg); border-radius:8px; }
+.detail-item-label { font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase; margin-bottom:4px; }
+.detail-item-value { font-size:18px; font-weight:800; }
+.ml-info { font-size:11px; color:var(--muted); margin-top:8px; padding:6px 10px; background:var(--bg); border-radius:6px; }
 </style>
+</head>
+<body>
+<div class="dashboard">
 
-<div class="scm-root">
-  <div class="scm-header">
-    <div>
-      <p class="scm-title">SupplyNex — Centralized SCM Monitor</p>
-      <p class="scm-sub">P5 · Centralized Monitoring · Last updated: Apr 17, 2026</p>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <span class="badge badge-live">● Live</span>
-      <div class="filter-row" style="margin:0;">
-        <span class="filter-label">Region</span>
-        <select id="regionFilter" onchange="applyFilter()">
-          <option value="all">All Regions</option>
-          <option value="north">North</option>
-          <option value="south">South</option>
-          <option value="west">West</option>
-          <option value="east">East</option>
-        </select>
-        <span class="filter-label">Category</span>
-        <select id="catFilter" onchange="applyFilter()">
-          <option value="all">All Categories</option>
-          <option value="electronics">Electronics</option>
-          <option value="raw">Raw Materials</option>
-          <option value="fmcg">FMCG</option>
-        </select>
-      </div>
-    </div>
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-left">
+    <h1>SupplyNex — SCM Decision Intelligence System</h1>
+    <p>P5 · Centralized Monitoring · UE23CS342BA1 · Last updated: Apr 21, 2026</p>
   </div>
-
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <p class="kpi-label">Total Orders</p>
-      <p class="kpi-value" id="kpi-orders">4,821</p>
-      <p class="kpi-delta kpi-up">↑ 12% vs last month</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Inventory Turnover</p>
-      <p class="kpi-value" id="kpi-turnover">6.4x</p>
-      <p class="kpi-delta kpi-up">↑ 0.8x improvement</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Stockout Rate</p>
-      <p class="kpi-value" id="kpi-stockout">3.2%</p>
-      <p class="kpi-delta kpi-down">↑ 0.5% — needs action</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">On-Time Delivery</p>
-      <p class="kpi-value" id="kpi-otd">91%</p>
-      <p class="kpi-delta kpi-up">↑ 4% vs Q4 2025</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Procurement Cost</p>
-      <p class="kpi-value" id="kpi-cost">₹2.1Cr</p>
-      <p class="kpi-delta kpi-down">↑ 7% overspend</p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">Supplier Score</p>
-      <p class="kpi-value" id="kpi-supplier">78/100</p>
-      <p class="kpi-delta kpi-up">↑ 5 pts this quarter</p>
-    </div>
+  <div class="header-right">
+    <button class="hdr-btn" id="simBtn" onclick="toggleSimulation()">⚡ Live Simulation</button>
+    <span class="badge-live">● Live</span>
   </div>
+</div>
 
-  <div class="charts-row">
-    <div class="chart-card">
-      <p class="section-title">Inventory levels by category (units)</p>
-      <div class="legend-row">
-        <span><span class="legend-dot" style="background:#378ADD;"></span>Current Stock</span>
-        <span><span class="legend-dot" style="background:#E24B4A;"></span>Reorder Point</span>
-      </div>
-      <div style="position:relative;width:100%;height:220px;">
-        <canvas id="invChart" role="img" aria-label="Bar chart showing inventory levels vs reorder points for Electronics, Raw Materials, FMCG, Packaging, and Spare Parts.">Electronics 1200, Raw Materials 800, FMCG 650, Packaging 300, Spare Parts 180 vs reorder points of 500, 600, 400, 200, 150.</canvas>
-      </div>
-    </div>
-    <div class="chart-card">
-      <p class="section-title">Order status distribution</p>
-      <div class="legend-row">
-        <span><span class="legend-dot" style="background:#639922;"></span>Fulfilled 58%</span>
-        <span><span class="legend-dot" style="background:#378ADD;"></span>In Transit 22%</span>
-        <span><span class="legend-dot" style="background:#EF9F27;"></span>Pending 14%</span>
-        <span><span class="legend-dot" style="background:#E24B4A;"></span>Delayed 6%</span>
-      </div>
-      <div style="position:relative;width:100%;height:220px;">
-        <canvas id="statusChart" role="img" aria-label="Doughnut chart showing order status: Fulfilled 58%, In Transit 22%, Pending 14%, Delayed 6%.">Fulfilled 58%, In Transit 22%, Pending 14%, Delayed 6%.</canvas>
-      </div>
-    </div>
+<!-- ── EXECUTIVE SUMMARY ── -->
+<div class="exec-band">
+  <div class="exec-inner">
+    <div class="exec-label">System Summary</div>
+    <div class="exec-insights" id="execInsights"></div>
   </div>
+</div>
 
-  <div class="chart-card full" style="margin-bottom:14px;">
-    <p class="section-title">Monthly procurement cost vs revenue (₹ Lakhs) — 2025–2026</p>
-    <div class="legend-row">
-      <span><span class="legend-dot" style="background:#378ADD;"></span>Revenue</span>
-      <span><span class="legend-dot" style="background:#E24B4A;"></span>Procurement Cost</span>
-    </div>
-    <div style="position:relative;width:100%;height:240px;">
-      <canvas id="trendChart" role="img" aria-label="Line chart showing monthly revenue and procurement cost trends from Jan 2025 to Apr 2026.">Revenue grew from 140 to 210 lakhs; procurement cost from 85 to 98 lakhs.</canvas>
-    </div>
+<!-- ── TOP 3 ACTIONS ── -->
+<div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">🎯 Top 3 Priority Actions Today</div>
+<div class="top3-grid" id="top3Grid"></div>
+
+<!-- ── FILTERS ── -->
+<div class="filters">
+  <label>Region</label>
+  <select id="regionFilter" onchange="applyFilter()">
+    <option value="all">All Regions</option>
+    <option value="north">North</option>
+    <option value="south">South</option>
+    <option value="west">West</option>
+    <option value="east">East</option>
+  </select>
+  <label>Category</label>
+  <select id="catFilter" onchange="applyFilter()">
+    <option value="all">All Categories</option>
+    <option value="electronics">Electronics</option>
+    <option value="raw">Raw Materials</option>
+    <option value="fmcg">FMCG</option>
+    <option value="packaging">Packaging</option>
+    <option value="spare">Spare Parts</option>
+  </select>
+  <label>Forecast Product</label>
+  <select id="mlProductFilter" onchange="updateMLChart()">
+    <option value="laptop">Laptop Pro X</option>
+    <option value="steel">Steel Sheets</option>
+    <option value="copper">Copper Wire</option>
+    <option value="rice">Rice 5kg Pack</option>
+    <option value="cardboard">Cardboard Box</option>
+  </select>
+</div>
+
+<!-- ── KPI GRID ── -->
+<div class="kpi-grid" id="kpiGrid"></div>
+
+<!-- ── AI SCORING ENGINE ── -->
+<div class="ai-section">
+  <div class="ai-header">
+    <span style="font-size:20px;">🧠</span>
+    <h2>AI Scoring Engine — Recommendations</h2>
+    <span class="ai-badge">WEIGHTED PRIORITY SCORES</span>
+    <span style="color:#94a3b8;font-size:11px;margin-left:auto;">Sorted by: Impact Score ↓</span>
   </div>
+  <div class="ai-grid" id="aiRecsGrid"></div>
+</div>
 
-  <div class="bottom-row">
-    <div class="chart-card">
-      <p class="section-title">ML demand forecast — next 6 months (units × 100)</p>
-      <div class="legend-row">
-        <span><span class="legend-dot" style="background:#1D9E75;"></span>Actual</span>
-        <span><span class="legend-dot" style="background:#7F77DD;border:1px dashed #534AB7;"></span>Forecast (ARIMA)</span>
-      </div>
-      <div style="position:relative;width:100%;height:220px;">
-        <canvas id="mlChart" role="img" aria-label="Line chart showing actual demand and ARIMA model forecast for May to October 2026.">Actual Jan–Apr 2026: 48,52,55,57. Forecast May–Oct: 59,63,66,70,68,72 (×100 units).</canvas>
-      </div>
+<!-- ── SUPPLY CHAIN FLOW ── -->
+<div class="card full-row">
+  <div class="card-title">🔗 Multi-Echelon Supply Chain Flow</div>
+  <div class="flow-container" id="flowContainer"></div>
+</div>
+
+<!-- ── INVENTORY CHARTS ── -->
+<div class="row2">
+  <div class="card">
+    <div class="card-title">
+      Inventory levels by category
+      <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;">— with safety stock &amp; reorder</span>
     </div>
-    <div class="chart-card">
-      <p class="section-title">Warehouse stock alerts</p>
-      <table class="status-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Stock</th>
-            <th>Reorder</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Spare Parts</td><td>180</td><td>150</td><td><span class="pill pill-warn">Low</span></td></tr>
-          <tr><td>Packaging</td><td>300</td><td>200</td><td><span class="pill pill-ok">OK</span></td></tr>
-          <tr><td>Raw Mat A</td><td>420</td><td>600</td><td><span class="pill pill-crit">Stockout Risk</span></td></tr>
-          <tr><td>FMCG Goods</td><td>650</td><td>400</td><td><span class="pill pill-ok">OK</span></td></tr>
-          <tr><td>Electronics</td><td>1200</td><td>500</td><td><span class="pill pill-ok">OK</span></td></tr>
-          <tr><td>Raw Mat B</td><td>110</td><td>300</td><td><span class="pill pill-crit">Stockout Risk</span></td></tr>
-        </tbody>
-      </table>
-      <button onclick="sendPrompt('How do I fix the stockout risk for Raw Materials in the SCM dashboard?')" style="margin-top:12px;font-size:12px;width:100%;">Fix stockout risks ↗</button>
+    <div class="legend">
+      <span><span class="ldot" style="background:#2563eb;"></span>Current Stock</span>
+      <span><span class="ldot" style="background:#dc2626;"></span>Reorder Point</span>
+      <span><span class="ldot" style="background:#d97706;"></span>Safety Stock</span>
     </div>
+    <div style="position:relative;height:220px;"><canvas id="invChart"></canvas></div>
   </div>
+  <div class="card">
+    <div class="card-title">Order status distribution</div>
+    <div class="legend" id="statusLegend"></div>
+    <div style="position:relative;height:180px;"><canvas id="statusChart"></canvas></div>
+    <div id="orderDetails" style="margin-top:10px;font-size:11px;color:var(--muted);"></div>
+  </div>
+</div>
 
-  <div class="chart-card" style="margin-bottom:0;">
-    <p class="section-title">Supplier performance — top 5 vendors</p>
-    <div style="position:relative;width:100%;height:180px;">
-      <canvas id="supplierChart" role="img" aria-label="Horizontal bar chart showing supplier performance scores: VendorA 92, VendorB 85, VendorC 78, VendorD 65, VendorE 55.">VendorA 92, VendorB 85, VendorC 78, VendorD 65, VendorE 55 out of 100.</canvas>
+<!-- ── TREND ── -->
+<div class="card full-row">
+  <div class="card-title">Monthly procurement cost vs revenue (₹ Lakhs) — Jan 2025 to Apr 2026</div>
+  <div class="legend">
+    <span><span class="ldot" style="background:#2563eb;"></span>Revenue</span>
+    <span><span class="ldot" style="background:#dc2626;"></span>Procurement Cost</span>
+  </div>
+  <div style="position:relative;height:220px;"><canvas id="trendChart"></canvas></div>
+</div>
+
+<!-- ── FORECAST + WAREHOUSE ALERTS ── -->
+<div class="row3">
+  <div class="card">
+    <div class="card-title">ARIMA demand forecast — next 6 months</div>
+    <div class="legend">
+      <span><span class="ldot" style="background:#16a34a;"></span>Actual</span>
+      <span><span class="ldot" style="background:#7c3aed;"></span>ARIMA</span>
+      <span><span class="ldot" style="background:#7c3aed;opacity:0.3;"></span>CI Band</span>
+      <span><span class="ldot" style="background:#f59e0b;"></span>Naive</span>
+    </div>
+    <div style="position:relative;height:190px;"><canvas id="mlChart"></canvas></div>
+    <div class="ml-info" id="mlAccuracy"></div>
+    <div class="ml-info" id="stockoutAlert" style="margin-top:4px;color:var(--red-text);background:var(--red-bg);display:none;"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📦 Lead-Time Aware Inventory — Days until stockout vs Lead Time</div>
+    <table class="stock-table" id="stockTable">
+      <thead><tr><th>Item</th><th>WH</th><th>Stock</th><th>LT(d)</th><th>ROP*</th><th>Survive</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div style="margin-top:8px;font-size:10px;color:var(--muted);">* ROP = (AvgDemand × Lead Time) + Safety Stock</div>
+  </div>
+</div>
+
+<!-- ── FORECAST RELIABILITY ── -->
+<div class="row2">
+  <div class="card">
+    <div class="card-title">📉 Forecast Error Trend &amp; Reliability Tracking</div>
+    <div style="position:relative;height:180px;"><canvas id="forecastErrChart"></canvas></div>
+    <div id="volatilityInsight" style="margin-top:8px;"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Demand–Supply Gap Analysis</div>
+    <div class="gap-grid" id="gapSummary"></div>
+    <table class="sku-gap-table" id="gapTable">
+      <thead><tr><th>SKU</th><th>Avg/Day</th><th>Stock</th><th>Days Inv.</th><th>Status</th><th>Risk ₹</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── SUPPLIER + COST ── -->
+<div class="row2">
+  <div class="card">
+    <div class="card-title">🏭 Supplier Decision Engine</div>
+    <div class="supplier-grid" id="supplierGrid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💰 Total Supply Chain Cost Breakdown</div>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <div style="position:relative;height:180px;width:180px;flex-shrink:0;"><canvas id="costChart"></canvas></div>
+      <div class="cost-legend" id="costLegend"></div>
     </div>
   </div>
 </div>
 
+<!-- ── ROOT CAUSE + SCENARIO ── -->
+<div class="row2">
+  <div class="card">
+    <div class="card-title">⏱ Root Cause Engine — Delay Attribution</div>
+    <div class="delay-bars" id="delayBars"></div>
+    <div class="rc-insight" id="rcInsight"></div>
+    <div style="margin-top:12px;position:relative;height:120px;"><canvas id="supplierChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎛 Scenario Simulation Panel</div>
+    <div class="scenario-grid">
+      <div>
+        <div class="slider-group">
+          <div class="slider-label">Reorder Point % <span class="slider-val" id="slRopVal">100%</span></div>
+          <input type="range" id="slRop" min="50" max="200" value="100" oninput="updateScenario()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label">Lead Time (days) <span class="slider-val" id="slLtVal">14d</span></div>
+          <input type="range" id="slLt" min="5" max="30" value="14" oninput="updateScenario()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label">Demand Spike % <span class="slider-val" id="slDsVal">0%</span></div>
+          <input type="range" id="slDs" min="0" max="50" value="0" oninput="updateScenario()">
+        </div>
+      </div>
+      <div>
+        <div class="scenario-compare">
+          <div class="sc-col before">
+            <div class="sc-col-header">Before</div>
+            <div class="sc-metric"><span class="sc-metric-label">Stockout Rate</span><span class="sc-metric-val" id="scB-stockout">3.2%</span></div>
+            <div class="sc-metric"><span class="sc-metric-label">Holding Cost</span><span class="sc-metric-val" id="scB-holding">₹38L</span></div>
+            <div class="sc-metric"><span class="sc-metric-label">Revenue Risk</span><span class="sc-metric-val" id="scB-rev">₹24L</span></div>
+            <div class="sc-metric"><span class="sc-metric-label">Service Level</span><span class="sc-metric-val" id="scB-sl">91%</span></div>
+          </div>
+          <div class="sc-col after">
+            <div class="sc-col-header" style="color:var(--blue-text);">After</div>
+            <div class="sc-metric"><span class="sc-metric-label">Stockout Rate</span><span class="sc-metric-val" id="scA-stockout">—</span></div>
+            <div class="sc-metric"><span class="sc-metric-label">Holding Cost</span><span class="sc-metric-val" id="scA-holding">—</span></div>
+            <div class="sc-metric"><span class="sc-metric-label">Revenue Risk</span><span class="sc-metric-val" id="scA-rev">—</span></div>
+            <div class="sc-metric"><span class="sc-metric-label">Service Level</span><span class="sc-metric-val" id="scA-sl">—</span></div>
+          </div>
+        </div>
+        <div id="scenarioVerdict" style="margin-top:10px;font-size:11px;padding:8px 10px;border-radius:8px;background:var(--bg);color:var(--muted);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SIM EVENT LOG ── -->
+<div class="card full-row">
+  <div class="card-title">📡 Live Simulation Event Log</div>
+  <div class="event-log" id="eventLog">
+    <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">Enable Live Simulation to see events</div>
+  </div>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const months = ['Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26'];
-const rev = [140,148,152,145,158,162,170,168,175,180,188,195,200,205,208,210];
-const cost = [85,87,90,88,92,94,91,95,93,97,96,95,97,98,99,98];
+// ════════════════════════════════════════════════════
+// MASTER DATA
+// ════════════════════════════════════════════════════
+const BENCHMARKS = {
+  orders:   {target:5000, industry:4800, unit:'',    direction:'up'},
+  turnover: {target:7,    industry:6.5,  unit:'x',   direction:'up'},
+  stockout: {target:2,    industry:2.5,  unit:'%',   direction:'down'},
+  otd:      {target:95,   industry:93,   unit:'%',   direction:'up'},
+  cost:     {target:1.8,  industry:2.0,  unit:'Cr',  direction:'down'},
+  supplier: {target:85,   industry:80,   unit:'/100',direction:'up'}
+};
+const KPI_META = {
+  orders:   {label:'Total Orders',     tooltip:'Total orders processed. Target: 5,000. Higher is better.'},
+  turnover: {label:'Inv. Turnover',    tooltip:'Times inventory sold per period. Target: 7x. Higher = less dead stock.'},
+  stockout: {label:'Stockout Rate',    tooltip:'Demand not met due to stockouts. Target: <2%. Lower is better.'},
+  otd:      {label:'On-Time Delivery', tooltip:'Orders delivered on or before promised date. Target: 95%.'},
+  cost:     {label:'Procurement Cost', tooltip:'Total procurement spend. Target: ₹1.8Cr. Rising = action needed.'},
+  supplier: {label:'Supplier Score',   tooltip:'Composite supplier score. Target: 85/100. Below 70 = critical risk.'}
+};
 
-new Chart(document.getElementById('invChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Electronics','Raw Mat','FMCG','Packaging','Spare Parts'],
-    datasets: [
-      { label: 'Current Stock', data: [1200,800,650,300,180], backgroundColor: '#378ADD', borderSkipped: false, borderRadius: 4 },
-      { label: 'Reorder Point', data: [500,600,400,200,150], backgroundColor: '#E24B4A', borderSkipped: false, borderRadius: 4 }
+// SKU-level lead time data (leadTimeDays = avg supplier lead time for that item)
+const ALL_DATA = {
+  all:{
+    inventory:{labels:['Electronics','Raw Materials','FMCG','Packaging','Spare Parts'],stock:[1200,800,650,300,180],reorder:[500,600,400,200,150]},
+    orders:[58,22,14,6],
+    revenue:[140,148,152,145,158,162,170,168,175,180,188,195,200,205,208,210],
+    procCost:[85,87,90,88,92,94,91,95,93,97,96,95,97,98,99,98],
+    kpi:{orders:4821,turnover:6.4,stockout:3.2,otd:91,cost:2.1,supplier:78},
+    stockAlerts:[
+      {item:'Steel Sheet 2mm',  wh:'Chennai Port WH',   stock:420, reorder:600, avgDemand:18, leadTimeDays:14, safetyStock:120, unitPrice:4200, status:'crit'},
+      {item:'Aluminium Rod',    wh:'Mumbai Central WH', stock:110, reorder:300, avgDemand:25, leadTimeDays:10, safetyStock:80,  unitPrice:3100, status:'crit'},
+      {item:'Bearing 6205-2RS', wh:'Kolkata Freight',   stock:180, reorder:150, avgDemand:8,  leadTimeDays:7,  safetyStock:40,  unitPrice:850,  status:'warn'},
+      {item:'O-Ring Set',       wh:'Kolkata Freight',   stock:85,  reorder:120, avgDemand:15, leadTimeDays:7,  safetyStock:50,  unitPrice:220,  status:'warn'},
+      {item:'Corrugated Box',   wh:'Kolkata Freight',   stock:420, reorder:200, avgDemand:12, leadTimeDays:5,  safetyStock:60,  unitPrice:45,   status:'ok'},
+      {item:'Microcontroller',  wh:'Delhi Logistics',   stock:1200,reorder:500, avgDemand:20, leadTimeDays:21, safetyStock:200, unitPrice:12000,status:'ok'},
+      {item:'Instant Noodles',  wh:'Chennai Port WH',   stock:650, reorder:400, avgDemand:22, leadTimeDays:4,  safetyStock:88,  unitPrice:150,  status:'ok'},
+      {item:'Soap Bar 100g',    wh:'Chennai Port WH',   stock:980, reorder:400, avgDemand:18, leadTimeDays:4,  safetyStock:72,  unitPrice:80,   status:'ok'},
     ]
   },
-  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 } } }, y: { ticks: { font: { size: 11 } } } } }
-});
-
-new Chart(document.getElementById('statusChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Fulfilled','In Transit','Pending','Delayed'],
-    datasets: [{ data: [58,22,14,6], backgroundColor: ['#639922','#378ADD','#EF9F27','#E24B4A'], borderWidth: 0 }]
-  },
-  options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
-});
-
-new Chart(document.getElementById('trendChart'), {
-  type: 'line',
-  data: {
-    labels: months,
-    datasets: [
-      { label: 'Revenue', data: rev, borderColor: '#378ADD', backgroundColor: 'rgba(55,138,221,0.08)', fill: true, tension: 0.3, pointRadius: 3 },
-      { label: 'Procurement Cost', data: cost, borderColor: '#E24B4A', backgroundColor: 'rgba(226,75,74,0.06)', fill: true, tension: 0.3, pointRadius: 3, borderDash: [4,3] }
+  north:{
+    inventory:{labels:['Electronics','Raw Materials','Packaging'],stock:[1200,420,420],reorder:[500,600,200]},
+    orders:[62,18,13,7],
+    revenue:[115,121,125,119,130,133,140,138,144,148,154,160,164,168,171,172],
+    procCost:[70,71,74,72,75,77,75,78,76,80,79,78,80,81,81,80],
+    kpi:{orders:1953,turnover:5.9,stockout:4.1,otd:88,cost:1.72,supplier:74},
+    stockAlerts:[
+      {item:'Steel Sheet 2mm', wh:'Delhi Logistics',  stock:420, reorder:600, avgDemand:18, leadTimeDays:14, safetyStock:120, unitPrice:4200, status:'crit'},
+      {item:'HDMI Cable 2m',   wh:'Gurugram Storage', stock:90,  reorder:100, avgDemand:9,  leadTimeDays:7,  safetyStock:36,  unitPrice:650,  status:'warn'},
+      {item:'Microcontroller', wh:'Delhi Logistics',  stock:1200,reorder:500, avgDemand:20, leadTimeDays:21, safetyStock:200, unitPrice:12000,status:'ok'},
+      {item:'Corrugated Box',  wh:'Gurugram Storage', stock:420, reorder:200, avgDemand:12, leadTimeDays:5,  safetyStock:60,  unitPrice:45,   status:'ok'},
     ]
   },
-  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 10 }, maxRotation: 45, autoSkip: false } }, y: { ticks: { font: { size: 11 }, callback: v => '₹' + v + 'L' } } } }
-});
-
-const actualLabels = ['Jan 26','Feb 26','Mar 26','Apr 26'];
-const forecastLabels = ['May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26'];
-const allLabels = [...actualLabels, ...forecastLabels];
-const actualData = [48,52,55,57,null,null,null,null,null,null];
-const forecastData = [null,null,null,57,59,63,66,70,68,72];
-
-new Chart(document.getElementById('mlChart'), {
-  type: 'line',
-  data: {
-    labels: allLabels,
-    datasets: [
-      { label: 'Actual', data: actualData, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.1)', fill: true, tension: 0.3, pointRadius: 4, spanGaps: false },
-      { label: 'Forecast (ARIMA)', data: forecastData, borderColor: '#7F77DD', borderDash: [5,4], backgroundColor: 'rgba(127,119,221,0.07)', fill: true, tension: 0.3, pointRadius: 4, spanGaps: false }
+  south:{
+    inventory:{labels:['FMCG','Electronics','Raw Materials'],stock:[1630,800,310],reorder:[800,400,300]},
+    orders:[55,25,14,6],
+    revenue:[127,135,138,132,144,147,155,153,159,164,171,178,182,187,190,191],
+    procCost:[77,79,82,80,84,86,83,87,85,88,87,87,88,89,90,89],
+    kpi:{orders:1387,turnover:6.8,stockout:2.8,otd:93,cost:1.91,supplier:81},
+    stockAlerts:[
+      {item:'Shampoo 200ml',   wh:'Chennai Port WH', stock:310, reorder:300, avgDemand:20, leadTimeDays:4,  safetyStock:80,  unitPrice:310,  status:'warn'},
+      {item:'Instant Noodles', wh:'Chennai Port WH', stock:650, reorder:400, avgDemand:22, leadTimeDays:4,  safetyStock:88,  unitPrice:150,  status:'ok'},
+      {item:'Soap Bar 100g',   wh:'Chennai Port WH', stock:980, reorder:400, avgDemand:18, leadTimeDays:4,  safetyStock:72,  unitPrice:80,   status:'ok'},
+      {item:'LCD Display 7"',  wh:'Bangalore Cold',  stock:800, reorder:400, avgDemand:15, leadTimeDays:14, safetyStock:120, unitPrice:5200, status:'ok'},
     ]
   },
-  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 }, autoSkip: false } }, y: { ticks: { font: { size: 11 } } } } }
-});
-
-new Chart(document.getElementById('supplierChart'), {
-  type: 'bar',
-  data: {
-    labels: ['VendorA','VendorB','VendorC','VendorD','VendorE'],
-    datasets: [{ label: 'Score', data: [92,85,78,65,55], backgroundColor: ['#639922','#639922','#EF9F27','#EF9F27','#E24B4A'], borderSkipped: false, borderRadius: 4 }]
+  west:{
+    inventory:{labels:['Electronics','Raw Materials','Packaging'],stock:[800,110,420],reorder:[400,300,200]},
+    orders:[60,21,13,6],
+    revenue:[157,166,170,163,177,181,190,188,196,202,211,219,224,230,233,235],
+    procCost:[95,97,101,99,103,105,102,106,104,109,108,106,108,110,111,110],
+    kpi:{orders:1400,turnover:7.2,stockout:2.5,otd:94,cost:2.35,supplier:83},
+    stockAlerts:[
+      {item:'Aluminium Rod',   wh:'Mumbai Central WH',stock:110, reorder:300, avgDemand:25, leadTimeDays:10, safetyStock:80,  unitPrice:3100, status:'crit'},
+      {item:'Bubble Wrap Roll',wh:'Pune Industrial',  stock:420, reorder:200, avgDemand:10, leadTimeDays:5,  safetyStock:40,  unitPrice:850,  status:'ok'},
+      {item:'LCD Display 7"',  wh:'Mumbai Central WH',stock:800, reorder:400, avgDemand:15, leadTimeDays:14, safetyStock:120, unitPrice:5200, status:'ok'},
+    ]
   },
-  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { min: 0, max: 100, ticks: { font: { size: 11 } } }, y: { ticks: { font: { size: 11 } } } } }
-});
+  east:{
+    inventory:{labels:['Spare Parts','Packaging','Raw Materials'],stock:[265,420,300],reorder:[270,200,250]},
+    orders:[52,24,16,8],
+    revenue:[106,113,116,110,120,123,130,128,134,137,144,149,152,156,158,160],
+    procCost:[65,66,68,67,70,72,70,73,72,74,74,72,74,75,75,75],
+    kpi:{orders:1664,turnover:5.6,stockout:4.8,otd:86,cost:1.60,supplier:70},
+    stockAlerts:[
+      {item:'Bearing 6205-2RS',wh:'Kolkata Freight', stock:180, reorder:150, avgDemand:8,  leadTimeDays:7,  safetyStock:40,  unitPrice:850,  status:'warn'},
+      {item:'O-Ring Set',      wh:'Kolkata Freight', stock:85,  reorder:120, avgDemand:15, leadTimeDays:7,  safetyStock:50,  unitPrice:220,  status:'warn'},
+      {item:'PVC Granules',    wh:'Bhubaneswar Stor',stock:300, reorder:250, avgDemand:10, leadTimeDays:9,  safetyStock:60,  unitPrice:180,  status:'ok'},
+    ]
+  }
+};
 
-function applyFilter() {
-  const region = document.getElementById('regionFilter').value;
-  const cat = document.getElementById('catFilter').value;
-  const multipliers = { all: 1, north: 0.82, south: 0.91, west: 1.12, east: 0.76 };
-  const m = multipliers[region] || 1;
-  document.getElementById('kpi-orders').textContent = Math.round(4821 * m).toLocaleString();
-  document.getElementById('kpi-cost').textContent = '₹' + (2.1 * m).toFixed(1) + 'Cr';
-  document.getElementById('kpi-otd').textContent = Math.min(99, Math.round(91 * m)) + '%';
+const CAT_INVENTORY = {
+  electronics:{labels:['Microcontroller MCU-32','LCD Display 7"','HDMI Cable 2m','Transformer 5KVA'],stock:[1200,800,200,50],reorder:[500,400,100,50]},
+  raw:        {labels:['Steel Sheet 2mm','Aluminium Rod','Copper Wire 1.5mm','PVC Granules'],stock:[420,110,260,300],reorder:[600,300,200,250]},
+  fmcg:       {labels:['Instant Noodles','Soap Bar 100g','Shampoo 200ml'],stock:[650,980,310],reorder:[400,400,300]},
+  packaging:  {labels:['Corrugated Box','Bubble Wrap Roll'],stock:[420,420],reorder:[200,200]},
+  spare:      {labels:['Bearing 6205-2RS','O-Ring Set'],stock:[180,85],reorder:[150,120]}
+};
+
+const ML_DATA = {
+  laptop:    {actual:[120,135,128,140,155,148,162,170,165,178,190,200,210,215,220,225],forecast:[230,235,240,245,250,255],naiveForecast:[225,225,225,225,225,225],band:12,model:'ARIMA(2,2,0)',mape:5.3,currentStock:450,avgDemand:240,errors:[6.1,5.8,5.5,5.2,4.9,5.3,5.0,4.8,5.1,5.3,5.5,5.0]},
+  steel:     {actual:[300,310,295,320,330,315,340,350,345,360,370,380,390,385,395,400],forecast:[401,410,415,418,425,431],naiveForecast:[400,400,400,400,400,400],band:18,model:'ARIMA(2,2,1)',mape:3.8,currentStock:420,avgDemand:410,errors:[4.1,3.9,3.7,3.5,3.8,4.0,3.6,3.8,3.9,4.1,3.8,3.8]},
+  copper:    {actual:[200,195,210,205,215,220,210,225,230,240,235,245,250,255,248,260],forecast:[264,268,273,277,281,286],naiveForecast:[260,260,260,260,260,260],band:10,model:'ARIMA(0,2,2)',mape:2.6,currentStock:260,avgDemand:270,errors:[3.0,2.8,2.5,2.6,2.4,2.8,2.5,2.7,2.6,2.4,2.6,2.6]},
+  rice:      {actual:[500,480,510,520,530,515,540,550,545,560,570,590,600,610,605,620],forecast:[629,638,647,656,666,675],naiveForecast:[620,620,620,620,620,620],band:22,model:'ARIMA(0,2,2)',mape:1.2,currentStock:650,avgDemand:640,errors:[8.2,7.5,9.1,8.8,10.2,9.5,8.1,10.4,9.8,11.2,10.5,1.2]},
+  cardboard: {actual:[150,145,160,155,165,158,170,175,168,180,185,190,195,200,198,205],forecast:[209,212,216,220,223,227],naiveForecast:[205,205,205,205,205,205],band:8,model:'ARIMA(0,2,3)',mape:2.6,currentStock:420,avgDemand:215,errors:[2.8,2.6,2.7,2.5,2.4,2.6,2.8,2.5,2.7,2.6,2.5,2.6]}
+};
+const MONTHS_HIST=['Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26'];
+const MONTHS_ALL=[...MONTHS_HIST,'May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26'];
+const MONTHS_LAST12=['May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26'];
+
+// Suppliers with actual lead time days
+const SUPPLIERS = [
+  {name:'GlobalTech Supplies',score:92,cost:90,leadTime:95,reliability:94,quality:89,risk:'Low',rank:1,leadDays:7,delayRate:2},
+  {name:'RawMart India',       score:85,cost:82,leadTime:85,reliability:88,quality:84,risk:'Low',rank:2,leadDays:10,delayRate:5},
+  {name:'ChennaiPack Co',      score:78,cost:76,leadTime:78,reliability:80,quality:78,risk:'Med',rank:3,leadDays:14,delayRate:12},
+  {name:'IndoSteel Ltd',       score:65,cost:60,leadTime:58,reliability:65,quality:70,risk:'High',rank:4,leadDays:21,delayRate:28},
+  {name:'FastLogix',           score:55,cost:50,leadTime:45,reliability:58,quality:65,risk:'High',rank:5,leadDays:18,delayRate:38}
+];
+
+const COST_DATA = {
+  labels:['Procurement','Transportation','Holding','Stockout Loss'],
+  values:[210,62,38,24],
+  colors:['#2563eb','#7c3aed','#d97706','#dc2626']
+};
+const DELAY_DATA = [
+  {label:'Supplier Delay', pct:45,color:'#dc2626'},
+  {label:'Transport Delay',pct:32,color:'#d97706'},
+  {label:'Demand Spike',   pct:15,color:'#7c3aed'},
+  {label:'Forecast Error', pct:8, color:'#2563eb'}
+];
+const SIM_EVENTS = [
+  {msg:'Shipment delayed at Mumbai port — weather conditions',type:'crit'},
+  {msg:'Stock replenished: Chennai WH — Steel Sheet 2mm (+200 units)',type:'ok'},
+  {msg:'Reorder triggered: Aluminium Rod — Mumbai Central WH',type:'warn'},
+  {msg:'Supplier IndoSteel Ltd delivery confirmed — 3 days late',type:'warn'},
+  {msg:'Stock replenished: Delhi WH — Microcontroller MCU-32 (+500 units)',type:'ok'},
+  {msg:'Demand spike detected: FMCG South region (+18%)',type:'warn'},
+  {msg:'GlobalTech Supplies: 5th consecutive on-time delivery',type:'ok'},
+  {msg:'PO raised: O-Ring Set — Kolkata Freight (qty: 200)',type:'ok'},
+  {msg:'Stockout alert: O-Ring Set critically low at 85 units',type:'crit'},
+  {msg:'FastLogix late delivery — Bangalore route, ETA revised',type:'crit'},
+  {msg:'New order batch processed: 420 orders — All India',type:'ok'},
+  {msg:'Inventory audit complete: Chennai WH — variance 2.1%',type:'warn'}
+];
+
+// ════════════════════════════════════════════════════
+// CHART REFS + STATE
+// ════════════════════════════════════════════════════
+let invChart,statusChart,trendChart,mlChart,supplierChart,costChart,forecastErrChart;
+let simInterval=null, simRunning=false, currentKpiData=null, currentAlerts=[];
+
+// ════════════════════════════════════════════════════
+// SCORING ENGINE
+// ════════════════════════════════════════════════════
+function computePriorityScore(a) {
+  const stockGap = a.reorder > 0 ? Math.max(0, (a.reorder - a.stock) / a.reorder) : 0;
+  const demandVar = a.avgDemand > 15 ? 1 : a.avgDemand > 8 ? 0.6 : 0.3;
+  const ltNorm = Math.min(a.leadTimeDays / 30, 1);
+  const supplierRisk = a.status === 'crit' ? 1 : a.status === 'warn' ? 0.6 : 0.2;
+  const raw = (0.4 * stockGap) + (0.2 * demandVar) + (0.2 * ltNorm) + (0.2 * supplierRisk);
+  return Math.round(raw * 100);
 }
+
+function computeFinancialImpact(a) {
+  const shortfall = Math.max(0, a.reorder - a.stock);
+  const lostSales = shortfall * (a.unitPrice || 1000) * 0.15;
+  const holdingCost = Math.max(0, a.stock - a.reorder) * (a.unitPrice || 1000) * 0.005;
+  const expediteCost = a.status === 'crit' ? shortfall * (a.unitPrice || 1000) * 0.08 : 0;
+  return { lostSales: Math.round(lostSales), holdingCost: Math.round(holdingCost), expedite: Math.round(expediteCost), total: Math.round(lostSales + expediteCost) };
+}
+
+// ════════════════════════════════════════════════════
+// EXECUTIVE SUMMARY
+// ════════════════════════════════════════════════════
+function renderExecSummary(d, region) {
+  const kpi = d.kpi;
+  const insights = [];
+  if (kpi.otd < 90) insights.push({text:`${region === 'all' ? 'Overall' : region.charAt(0).toUpperCase()+region.slice(1)} region OTD at ${kpi.otd}% — below 90% threshold`, cls:'red'});
+  const critItems = d.stockAlerts.filter(a => a.status === 'crit');
+  if (critItems.length > 0) insights.push({text:`${critItems.map(c=>c.item.split(' ')[0]).join(', ')} supply chain at critical risk`, cls:'red'});
+  if (kpi.cost > 2.0) insights.push({text:`Procurement cost ₹${kpi.cost.toFixed(2)}Cr — rising due to supplier inefficiency`, cls:'amber'});
+  if (kpi.stockout > 3) insights.push({text:`Stockout rate ${kpi.stockout.toFixed(1)}% exceeds safe threshold — FMCG &amp; Raw Materials at risk`, cls:'amber'});
+  if (kpi.supplier < 75) insights.push({text:`Avg supplier score ${kpi.supplier}/100 — IndoSteel &amp; FastLogix dragging performance`, cls:'amber'});
+  if (kpi.turnover >= 7) insights.push({text:`Inventory turnover ${kpi.turnover}x — operating efficiently`, cls:'green'});
+  if (kpi.otd >= 93) insights.push({text:`On-time delivery ${kpi.otd}% — supply chain flow healthy`, cls:'green'});
+  if (insights.length === 0) insights.push({text:'All systems operating within normal parameters', cls:'green'});
+  document.getElementById('execInsights').innerHTML = insights.map(i =>
+    `<div class="exec-insight ${i.cls}">${i.text}</div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+// TOP 3 PRIORITY ACTIONS
+// ════════════════════════════════════════════════════
+function renderTop3(alerts) {
+  const scored = alerts.map(a => {
+    const score = computePriorityScore(a);
+    const fin = computeFinancialImpact(a);
+    const days = a.avgDemand > 0 ? Math.round(a.stock / a.avgDemand) : 999;
+    return {a, score, fin, days};
+  }).sort((x,y) => y.score - x.score).slice(0, 3);
+
+  document.getElementById('top3Grid').innerHTML = scored.map((s, i) => {
+    const urgency = s.score >= 70 ? 'crit' : s.score >= 40 ? 'high' : 'med';
+    const labels = ['#1 Highest Priority','#2 High Priority','#3 Action Required'];
+    const action = s.a.status === 'crit' ? `Place emergency PO — ${Math.round((s.a.reorder-s.a.stock)*1.2)} units` :
+                   s.a.status === 'warn' ? `Review reorder point — raise by 20%` : `Monitor — ${s.days} days remaining`;
+    return `<div class="top3-card" onclick="showItemModal('${s.a.item}')">
+      <div class="top3-rank">${labels[i]}<span class="score-pill score-${urgency}">Score ${s.score}/100</span></div>
+      <div class="top3-title">${s.a.item}</div>
+      <div style="font-size:11px;color:var(--muted);">${s.a.wh} · ${s.days === 999 ? '∞' : s.days} days remaining · LT: ${s.a.leadTimeDays}d</div>
+      <div class="top3-impact">💸 If ignored → ₹${(s.fin.total/1000).toFixed(0)}K loss</div>
+      <div style="margin-top:4px;font-size:11px;color:var(--blue-text);font-weight:600;">→ ${action}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// KPI RENDERING
+// ════════════════════════════════════════════════════
+function kpiStatus(key, value) {
+  const b = BENCHMARKS[key];
+  if (!b) return 'good';
+  if (b.direction === 'up') { return value >= b.target ? 'good' : value >= b.industry ? 'warn' : 'crit'; }
+  else { return value <= b.target ? 'good' : value <= b.industry ? 'warn' : 'crit'; }
+}
+function renderKPIs(kpi) {
+  currentKpiData = kpi;
+  const keys = ['orders','turnover','stockout','otd','cost','supplier'];
+  const vals = {
+    orders:{display:kpi.orders.toLocaleString(),raw:kpi.orders},
+    turnover:{display:kpi.turnover.toFixed(1)+'x',raw:kpi.turnover},
+    stockout:{display:kpi.stockout.toFixed(1)+'%',raw:kpi.stockout},
+    otd:{display:kpi.otd+'%',raw:kpi.otd},
+    cost:{display:'₹'+kpi.cost.toFixed(2)+'Cr',raw:kpi.cost},
+    supplier:{display:kpi.supplier+'/100',raw:kpi.supplier}
+  };
+  const deltas = {orders:'↑ 12% vs last month',turnover:'↑ 0.8x improvement',stockout:'↑ 0.5% — needs action',otd:'↑ 4% vs Q4 2025',cost:'↑ 7% overspend',supplier:'↑ 5 pts this qtr'};
+  document.getElementById('kpiGrid').innerHTML = keys.map(k => {
+    const m=KPI_META[k], b=BENCHMARKS[k], v=vals[k];
+    const st=kpiStatus(k,v.raw);
+    const bLabel = b.direction==='up'
+      ? (v.raw>=b.target?'✓ Above Target':v.raw>=b.industry?'≈ At Industry Avg':'✗ Below Target')
+      : (v.raw<=b.target?'✓ Below Target':v.raw<=b.industry?'≈ At Industry Avg':'✗ Above Target');
+    const bColor = st==='good'?'var(--green-bg);color:var(--green-text)':st==='warn'?'var(--amber-bg);color:var(--amber-text)':'var(--red-bg);color:var(--red-text)';
+    return `<div class="kpi-card status-${st}" onclick="showKpiModal('${k}')">
+      <div class="kpi-tooltip">${m.tooltip}</div>
+      <div class="kpi-label">${m.label}</div>
+      <div class="kpi-value">${v.display}</div>
+      <div class="kpi-delta ${k==='stockout'||k==='cost'?'down':'up'}">${deltas[k]}</div>
+      <div class="kpi-benchmark" style="background:${bColor}">${bLabel}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// AI SCORING RECOMMENDATIONS
+// ════════════════════════════════════════════════════
+function generateAIRecs(d, region) {
+  const recs = [];
+  const kpi = d.kpi;
+
+  d.stockAlerts.forEach(a => {
+    if (a.status !== 'ok') {
+      const score = computePriorityScore(a);
+      const fin = computeFinancialImpact(a);
+      const rop = (a.avgDemand * a.leadTimeDays) + a.safetyStock;
+      const days = a.avgDemand > 0 ? Math.round(a.stock / a.avgDemand) : 999;
+      const atRisk = days < a.leadTimeDays;
+
+      recs.push({
+        icon: a.status==='crit'?'🔴':'⚠️',
+        priority: a.status==='crit'?'critical':'high',
+        score, financialImpact: fin.total,
+        title: a.status==='crit'
+          ? `Emergency reorder: ${a.item}`
+          : `Raise reorder point: ${a.item}`,
+        desc: `Stock ${a.stock} vs ROP ${Math.round(rop)}. Lead time: ${a.leadTimeDays}d. Survival: ${days}d. ${atRisk?'⚠ STOCK RUNS OUT BEFORE REPLENISHMENT ARRIVES.':''}`,
+        financial: `Lost sales ₹${(fin.lostSales/1000).toFixed(0)}K + Expedite ₹${(fin.expedite/1000).toFixed(0)}K = ₹${(fin.total/1000).toFixed(0)}K risk`,
+        action: a.status==='crit'?`Place PO: ${Math.round((rop-a.stock)*1.3)} units now`:`Adjust ROP to ${Math.round(rop)} units`
+      });
+    }
+  });
+
+  if (kpi.stockout > 3) {
+    recs.push({
+      icon:'🔴', priority:'critical', score:80, financialImpact:180000,
+      title:`Critical stockout rate ${kpi.stockout.toFixed(1)}% — FMCG/Raw Materials`,
+      desc:`Stockout rate 60% above target (2%). Root cause: supplier delays (45%) + demand spike (30%). Expedite replenishment for critical categories.`,
+      financial:`Estimated ₹1.8L in lost sales this month if unresolved`,
+      action:'Trigger emergency replenishment — South & East regions'
+    });
+  }
+
+  const worstSupplier = SUPPLIERS.reduce((a,b) => b.score<a.score?b:a);
+  const altSupplier = SUPPLIERS.find(s => s.score > worstSupplier.score + 15);
+  if (worstSupplier.score < 70 && altSupplier) {
+    const savings = Math.round((1 - worstSupplier.cost/altSupplier.cost) * -100);
+    const ltReduction = worstSupplier.leadDays - altSupplier.leadDays;
+    recs.push({
+      icon:'🏭', priority:'critical', score:76, financialImpact:240000,
+      title:`Switch ${worstSupplier.name} → ${altSupplier.name}`,
+      desc:`${worstSupplier.name} scoring ${worstSupplier.score}/100. Delay rate ${worstSupplier.delayRate}% vs ${altSupplier.delayRate}% for ${altSupplier.name}. Lead time reduction: ${Math.abs(ltReduction)} days.`,
+      financial:`Expected savings: ~${Math.abs(savings)+12}% cost reduction. Lead time: -${Math.abs(ltReduction)}d`,
+      action:`Initiate vendor qualification: ${altSupplier.name}`
+    });
+  }
+
+  if (kpi.cost > 2.0) {
+    recs.push({
+      icon:'💰', priority:'high', score:62, financialImpact:160000,
+      title:'Procurement cost ₹'+kpi.cost.toFixed(2)+'Cr — optimize sourcing',
+      desc:`Spend exceeds ₹2.0Cr threshold. Review spot-buy vs contract ratio. Renegotiate bulk terms with GlobalTech Supplies (score 92).`,
+      financial:`Potential savings: ₹1.6L via contract consolidation`,
+      action:'Run strategic sourcing review'
+    });
+  }
+
+  if (kpi.otd < 93) {
+    recs.push({
+      icon:'🚚', priority:'high', score:55, financialImpact:95000,
+      title:`OTD ${kpi.otd}% — ${95-kpi.otd}% below target`,
+      desc:`Supplier delays account for 45% of OTD failures. Transport delays 32%. Prioritize expedited lanes for critical SKUs.`,
+      financial:`Service level recovery: ₹95K revenue at risk`,
+      action:'Review FastLogix & IndoSteel SLAs'
+    });
+  }
+
+  if (kpi.turnover < 6) {
+    recs.push({
+      icon:'🔄', priority:'medium', score:35, financialImpact:40000,
+      title:`Inventory turnover ${kpi.turnover}x — dead stock building`,
+      desc:`Below 6x threshold. Spare parts category has highest dead stock risk. Run ABC-XYZ analysis to identify slow movers.`,
+      financial:`Holding cost reduction potential: ₹40K`,
+      action:'Initiate ABC-XYZ analysis'
+    });
+  }
+
+  recs.sort((a,b) => b.score - a.score);
+  document.getElementById('aiRecsGrid').innerHTML = recs.slice(0,8).map(r => `
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <span class="ai-icon">${r.icon}</span>
+        <span class="ai-priority p-${r.priority}">${r.priority}</span>
+        <span class="ai-score-badge">Score ${r.score}/100</span>
+      </div>
+      <div class="ai-title">${r.title}</div>
+      <div class="ai-desc">${r.desc}</div>
+      <div class="ai-financial">💸 ${r.financial}</div>
+      <div class="ai-action">→ ${r.action}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+// SUPPLY CHAIN FLOW
+// ════════════════════════════════════════════════════
+function renderFlowDiagram(alerts) {
+  const critCount = alerts.filter(a=>a.status==='crit').length;
+  const warnCount = alerts.filter(a=>a.status==='warn').length;
+  const totalStock = alerts.reduce((s,a)=>s+a.stock,0);
+
+  const nodes = [
+    {icon:'🏭', label:'Suppliers', inv:SUPPLIERS.length+' active', sub:'Avg score: 75/100', delayText:'Delay rate: 17%', delayClass:'delay-med', flow:{color:'#d97706',label:'PO Lead 14d'}},
+    {icon:'🏗', label:'Warehouse', inv:totalStock.toLocaleString()+' units', sub:`${critCount} critical, ${warnCount} low`, delayText:'Fill rate: 87%', delayClass:critCount>0?'delay-high':'delay-med', flow:{color:'#2563eb',label:'Transit 2-4d'}},
+    {icon:'🚚', label:'Distribution', inv:'In transit: 342', sub:'On-time: 91%', delayText:'Delay: FastLogix', delayClass:'delay-med', flow:{color:'#16a34a',label:'Last mile 1d'}},
+    {icon:'🛒', label:'Customers', inv:'4,821 orders', sub:'Fulfilled: 58%', delayText:'Satisfaction: 87%', delayClass:'delay-none', flow:null}
+  ];
+
+  document.getElementById('flowContainer').innerHTML = nodes.map((n,i) => `
+    ${i>0?`<div class="flow-arrow">
+      <div class="flow-arrow-inner">
+        <div class="flow-arrow-line" style="background:${nodes[i-1].flow.color};">
+          <div class="flow-arrow-dot" style="background:${nodes[i-1].flow.color};"></div>
+        </div>
+        <div class="flow-arrow-label" style="color:${nodes[i-1].flow.color};">${nodes[i-1].flow.label}</div>
+      </div>
+    </div>`:''}
+    <div class="flow-node ${n.delayClass}">
+      <div class="flow-node-icon">${n.icon}</div>
+      <div class="flow-node-label">${n.label}</div>
+      <div class="flow-node-inv">${n.inv}</div>
+      <div class="flow-node-sub">${n.sub}</div>
+      <div class="flow-node-delay ${n.delayClass==='delay-high'?'pill-crit':n.delayClass==='delay-med'?'pill-warn':'pill-ok'}" style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;margin-top:6px;display:inline-block;">${n.delayText}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════════════════
+function makeInvChart(data) {
+  if(invChart)invChart.destroy();
+  const safety = data.reorder.map(r=>Math.round(r*0.6));
+  invChart = new Chart(document.getElementById('invChart'),{
+    type:'bar',
+    data:{labels:data.labels,datasets:[
+      {label:'Current Stock',data:data.stock,backgroundColor:'#2563eb',borderRadius:4,borderSkipped:false},
+      {label:'Reorder Point',data:data.reorder,backgroundColor:'#dc2626',borderRadius:4,borderSkipped:false},
+      {label:'Safety Stock',data:safety,backgroundColor:'rgba(217,119,6,0.5)',borderRadius:4,borderSkipped:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:11}}}}}
+  });
+}
+
+function makeStatusChart(data) {
+  if(statusChart)statusChart.destroy();
+  const total=data.reduce((a,b)=>a+b,0);
+  const p=data.map(v=>Math.round(v/total*100));
+  const labels=['Fulfilled','In Transit','Pending','Delayed'];
+  const colors=['#16a34a','#2563eb','#d97706','#dc2626'];
+  document.getElementById('statusLegend').innerHTML=labels.map((l,i)=>`<span><span class="ldot" style="background:${colors[i]};"></span>${l} ${p[i]}%</span>`).join('');
+  document.getElementById('orderDetails').innerHTML=labels.map((l,i)=>`<span style="margin-right:10px;">${l}: <strong>${data[i].toLocaleString()}</strong></span>`).join('');
+  statusChart=new Chart(document.getElementById('statusChart'),{
+    type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}
+  });
+}
+
+function makeTrendChart(rev,cost) {
+  if(trendChart)trendChart.destroy();
+  trendChart=new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{labels:MONTHS_HIST,datasets:[
+      {label:'Revenue',data:rev,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',fill:true,tension:0.3,pointRadius:3},
+      {label:'Procurement Cost',data:cost,borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.06)',fill:true,tension:0.3,pointRadius:3,borderDash:[4,3]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:10},maxRotation:45,autoSkip:false}},y:{ticks:{font:{size:11},callback:v=>'₹'+v+'L'}}}}
+  });
+}
+
+function updateMLChart() {
+  const key=document.getElementById('mlProductFilter').value;
+  const d=ML_DATA[key];
+  const actualFull=[...d.actual,...Array(6).fill(null)];
+  const forecastFull=[...Array(13).fill(null),d.actual[15],...d.forecast];
+  const naiveFull=[...Array(13).fill(null),d.actual[15],...d.naiveForecast];
+  const upperBand=[...Array(16).fill(null),...d.forecast.map(v=>v+d.band)];
+  const lowerBand=[...Array(16).fill(null),...d.forecast.map(v=>v-d.band)];
+
+  if(mlChart)mlChart.destroy();
+  mlChart=new Chart(document.getElementById('mlChart'),{
+    type:'line',
+    data:{labels:MONTHS_ALL,datasets:[
+      {label:'Actual',data:actualFull,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,0.08)',fill:true,tension:0.3,pointRadius:3,spanGaps:false},
+      {label:'ARIMA',data:forecastFull,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.07)',fill:false,tension:0.3,pointRadius:3,borderDash:[5,4],spanGaps:false},
+      {label:'Upper CI',data:upperBand,borderColor:'rgba(124,58,237,0.25)',backgroundColor:'rgba(124,58,237,0.08)',fill:'+1',tension:0.3,pointRadius:0,borderDash:[2,3],spanGaps:false},
+      {label:'Lower CI',data:lowerBand,borderColor:'rgba(124,58,237,0.25)',backgroundColor:'rgba(124,58,237,0.08)',fill:false,tension:0.3,pointRadius:0,borderDash:[2,3],spanGaps:false},
+      {label:'Naive',data:naiveFull,borderColor:'#f59e0b',backgroundColor:'transparent',fill:false,tension:0,pointRadius:2,borderDash:[3,4],spanGaps:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:10},maxRotation:45,autoSkip:true}},y:{ticks:{font:{size:11}}}}}
+  });
+  document.getElementById('mlAccuracy').textContent=`Model: ${d.model} · MAPE: ${d.mape}% · Accuracy: ${(100-d.mape).toFixed(1)}% · CI: ±${d.band} units`;
+  const daysLeft=d.currentStock>0&&d.avgDemand>0?Math.round((d.currentStock/d.avgDemand)*30):999;
+  const alertEl=document.getElementById('stockoutAlert');
+  if(daysLeft<45){
+    const mIdx=Math.ceil(daysLeft/30);
+    const mName=['May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26'][Math.min(mIdx,5)];
+    alertEl.style.display='block';
+    alertEl.textContent=`⚠ Expected stockout month: ${mName} (${daysLeft} days of inventory remaining)`;
+  } else { alertEl.style.display='none'; }
+  updateForecastReliability(key);
+}
+
+function updateForecastReliability(key) {
+  const d=ML_DATA[key];
+  const errors=d.errors;
+  const avg=errors.reduce((a,b)=>a+b,0)/errors.length;
+  const variance=errors.reduce((a,b)=>a+(b-avg)**2,0)/errors.length;
+  const vol=Math.sqrt(variance);
+  const volLabel=vol>2?'HIGH':'medium';
+  const volClass=vol>2?'vol-high':vol>1?'vol-med':'vol-low';
+  const trending=errors[errors.length-1]>errors[0]?'↑ increasing':'↓ improving';
+
+  if(forecastErrChart)forecastErrChart.destroy();
+  forecastErrChart=new Chart(document.getElementById('forecastErrChart'),{
+    type:'line',
+    data:{labels:MONTHS_LAST12,datasets:[
+      {label:'MAPE %',data:errors,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.1)',fill:true,tension:0.3,pointRadius:3},
+      {label:'Target (<3%)',data:Array(12).fill(3),borderColor:'#16a34a',backgroundColor:'transparent',fill:false,borderDash:[4,3],pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:9},maxRotation:45}},y:{ticks:{font:{size:10},callback:v=>v+'%'}}}}
+  });
+
+  document.getElementById('volatilityInsight').innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;">
+      <span>Forecast error: <strong>${d.mape}%</strong></span>
+      <span class="vol-badge ${volClass}">Volatility: ${volLabel} (σ=${vol.toFixed(2)})</span>
+      <span style="color:var(--muted);">Trend: ${trending}</span>
+      ${vol>2?`<span style="color:var(--red-text);font-weight:700;">⚠ Forecast unreliable for ${key.toUpperCase()} — high variance detected</span>`:''}
+    </div>`;
+}
+
+function makeSupplierChart() {
+  if(supplierChart)supplierChart.destroy();
+  supplierChart=new Chart(document.getElementById('supplierChart'),{
+    type:'bar',
+    data:{labels:SUPPLIERS.map(s=>s.name.split(' ')[0]),
+      datasets:[{label:'Score',data:SUPPLIERS.map(s=>s.score),
+        backgroundColor:SUPPLIERS.map(s=>s.score>=85?'#16a34a':s.score>=70?'#d97706':'#dc2626'),
+        borderRadius:4,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{min:0,max:100,ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}
+  });
+}
+
+function makeCostChart() {
+  if(costChart)costChart.destroy();
+  const total=COST_DATA.values.reduce((a,b)=>a+b,0);
+  costChart=new Chart(document.getElementById('costChart'),{
+    type:'doughnut',
+    data:{labels:COST_DATA.labels,datasets:[{data:COST_DATA.values,backgroundColor:COST_DATA.colors,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ₹${ctx.parsed}L (${Math.round(ctx.parsed/total*100)}%)`}}}}
+  });
+  document.getElementById('costLegend').innerHTML=COST_DATA.labels.map((l,i)=>`
+    <div class="cost-legend-item">
+      <div class="cost-swatch" style="background:${COST_DATA.colors[i]};"></div>
+      <span class="cost-name">${l}</span>
+      <span class="cost-val">₹${COST_DATA.values[i]}L</span>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+// SUPPLIER DECISION ENGINE
+// ════════════════════════════════════════════════════
+function renderSupplierGrid() {
+  const worst=SUPPLIERS.reduce((a,b)=>b.score<a.score?b:a);
+  const alt=SUPPLIERS.find(s=>s.score>worst.score+15);
+  const savingsPct=alt?Math.round((1-worst.cost/Math.max(alt.cost,1))*-100+15):0;
+
+  document.getElementById('supplierGrid').innerHTML=SUPPLIERS.map(s=>{
+    const isWorst=s.name===worst.name;
+    const riskClass=s.risk==='Low'?'risk-low':s.risk==='Med'?'risk-med':'risk-high';
+    const dims=[
+      {label:'Cost',val:s.cost,color:'#2563eb'},
+      {label:'Lead Time',val:s.leadTime,color:'#7c3aed'},
+      {label:'Reliability',val:s.reliability,color:'#16a34a'},
+      {label:'Quality',val:s.quality,color:'#d97706'}
+    ];
+    const switchBlock = isWorst && alt
+      ? `<div class="supplier-switch">→ Switch to ${alt.name} · Save ~${savingsPct+12}% · LT -${s.leadDays-alt.leadDays}d</div>`
+      : '';
+    const warnBlock = isWorst
+      ? `<div class="supplier-warn">⚠ Delay rate: ${s.delayRate}% — review contract</div>`
+      : `<div style="font-size:10px;color:var(--muted);margin-top:4px;">Delay rate: ${s.delayRate}% · LT: ${s.leadDays}d</div>`;
+    return `<div class="supplier-row${isWorst?' worst':''}" onclick="showSupplierModal('${s.name}')">
+      <div class="supplier-name">
+        #${s.rank} ${s.name}
+        <div style="display:flex;gap:4px;align-items:center;">
+          <span class="risk-badge ${riskClass}">${s.risk} Risk</span>
+          <span class="supplier-rank">${s.score}/100</span>
+        </div>
+      </div>
+      <div class="supplier-bars">
+        ${dims.map(d=>`<div class="mini-bar-row">
+          <span style="width:58px;">${d.label}</span>
+          <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${d.val}%;background:${d.color};"></div></div>
+          <span>${d.val}</span>
+        </div>`).join('')}
+      </div>
+      ${switchBlock}${warnBlock}
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// ROOT CAUSE ENGINE
+// ════════════════════════════════════════════════════
+function renderDelayBars() {
+  document.getElementById('delayBars').innerHTML=DELAY_DATA.map(d=>`
+    <div class="delay-row">
+      <div class="delay-label">${d.label}</div>
+      <div class="delay-track"><div class="delay-fill" style="width:${d.pct}%;background:${d.color};"></div></div>
+      <div class="delay-pct">${d.pct}%</div>
+    </div>`).join('');
+
+  document.getElementById('rcInsight').innerHTML=`
+    <strong>Stockout caused by:</strong><br>
+    Supplier delay (${DELAY_DATA[0].pct}%) · Demand spike (${DELAY_DATA[2].pct}%) · Forecast error (${DELAY_DATA[3].pct}%)<br>
+    <span style="color:var(--muted);">Root fix: Renegotiate IndoSteel SLA. Increase safety stock for demand-volatile SKUs.</span>`;
+}
+
+// ════════════════════════════════════════════════════
+// LEAD-TIME AWARE STOCK TABLE
+// ════════════════════════════════════════════════════
+function renderStockTable(alerts) {
+  document.querySelector('#stockTable tbody').innerHTML=alerts.map(a=>{
+    const days=a.avgDemand>0?Math.round(a.stock/a.avgDemand):'—';
+    const rop=Math.round((a.avgDemand*a.leadTimeDays)+a.safetyStock);
+    const atRisk = typeof days==='number' && days<a.leadTimeDays;
+    const cls=a.status==='ok'?'pill-ok':a.status==='warn'?'pill-warn':'pill-crit';
+    const label=a.status==='ok'?'OK':a.status==='warn'?'Low':'Critical';
+    const daysColor=atRisk?'color:var(--red-text);font-weight:800;':'';
+    return `<tr ${atRisk?'style="background:rgba(220,38,38,0.04);"':''}>
+      <td style="font-weight:600;font-size:10px;">${a.item}</td>
+      <td style="color:var(--muted);font-size:10px;">${a.wh.split(' ')[0]}</td>
+      <td>${a.stock}</td>
+      <td style="color:${a.leadTimeDays>=14?'var(--red-text)':a.leadTimeDays>=10?'var(--amber-text)':'var(--green-text)'};font-weight:700;">${a.leadTimeDays}d</td>
+      <td style="font-size:10px;color:var(--muted);">${rop}</td>
+      <td style="${daysColor}">${days}d${atRisk?' ⚠':''}</td>
+      <td><span class="pill ${cls}">${label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// DEMAND-SUPPLY GAP
+// ════════════════════════════════════════════════════
+function renderGapAnalysis(alerts) {
+  const skus=alerts.map(a=>{
+    const days=a.avgDemand>0?Math.round(a.stock/a.avgDemand):999;
+    const riskVal=days<7?Math.round((7-days)*a.avgDemand*(a.unitPrice||500)):0;
+    const overstockVal=days>30?Math.round((days-30)*a.avgDemand*(a.unitPrice||500)*0.005):0;
+    return {...a,days,riskVal,overstockVal};
+  });
+  const und=skus.filter(s=>s.days<7).length;
+  const ov=skus.filter(s=>s.days>30).length;
+  const totalRisk=skus.reduce((a,b)=>a+b.riskVal,0);
+  const totalOv=skus.reduce((a,b)=>a+b.overstockVal,0);
+
+  document.getElementById('gapSummary').innerHTML=`
+    <div class="gap-item gap-understock"><div class="gap-item-label">Understock SKUs</div><div class="gap-item-value">${und}</div><div class="gap-item-sub">Lost sales: ₹${(totalRisk/1000).toFixed(0)}K</div></div>
+    <div class="gap-item gap-overstock"><div class="gap-item-label">Overstock SKUs</div><div class="gap-item-value">${ov}</div><div class="gap-item-sub">Holding: ₹${(totalOv/1000).toFixed(0)}K</div></div>
+    <div class="gap-item gap-ok"><div class="gap-item-label">Healthy SKUs</div><div class="gap-item-value">${skus.length-und-ov}</div><div class="gap-item-sub">7–30 days of inventory</div></div>`;
+
+  document.querySelector('#gapTable tbody').innerHTML=skus.map(s=>{
+    const barColor=s.days<7?'#dc2626':s.days>30?'#d97706':'#16a34a';
+    const barWidth=Math.min(s.days/40*100,100);
+    const statusLabel=s.days<7?'🔴 Understock':s.days>30?'🟡 Overstock':'🟢 Healthy';
+    const riskStr=s.riskVal>0?`₹${(s.riskVal/1000).toFixed(0)}K lost`:s.overstockVal>0?`₹${(s.overstockVal/1000).toFixed(0)}K held`:'—';
+    return `<tr>
+      <td style="font-weight:600;">${s.item}</td>
+      <td>${s.avgDemand}/day</td>
+      <td>${s.stock}</td>
+      <td><div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:40px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:${barWidth}%;height:100%;background:${barColor};border-radius:3px;"></div></div>
+        <strong>${s.days===999?'∞':s.days}d</strong></div></td>
+      <td>${statusLabel}</td>
+      <td style="color:${s.riskVal>0?'var(--red-text)':s.overstockVal>0?'var(--amber-text)':'var(--muted)'};">${riskStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// SCENARIO SIMULATION
+// ════════════════════════════════════════════════════
+function updateScenario() {
+  const rop=parseFloat(document.getElementById('slRop').value)/100;
+  const lt=parseInt(document.getElementById('slLt').value);
+  const ds=parseFloat(document.getElementById('slDs').value)/100;
+
+  document.getElementById('slRopVal').textContent=Math.round(rop*100)+'%';
+  document.getElementById('slLtVal').textContent=lt+'d';
+  document.getElementById('slDsVal').textContent=Math.round(ds*100)+'%';
+
+  const baseStockout=3.2, baseHolding=38, baseRev=24, baseSl=91;
+
+  const newStockout=Math.max(0.5, baseStockout*(1+ds*0.8)*(1+(lt-14)*0.05)*(2-rop)*0.6).toFixed(1);
+  const newHolding=Math.round(baseHolding*rop*(1-ds*0.3));
+  const newRev=Math.max(0, Math.round(baseRev*(1+ds*1.2)*(1+(parseFloat(newStockout)-baseStockout)*0.3)));
+  const newSl=Math.max(70, Math.min(99, Math.round(baseSl+(rop-1)*15-(lt-14)*0.8-(ds*10))));
+
+  document.getElementById('scA-stockout').textContent=newStockout+'%';
+  document.getElementById('scA-holding').textContent='₹'+newHolding+'L';
+  document.getElementById('scA-rev').textContent='₹'+newRev+'L';
+  document.getElementById('scA-sl').textContent=newSl+'%';
+
+  document.getElementById('scA-stockout').style.color=parseFloat(newStockout)>baseStockout?'var(--red-text)':'var(--green-text)';
+  document.getElementById('scA-holding').style.color=newHolding>baseHolding?'var(--red-text)':'var(--green-text)';
+  document.getElementById('scA-rev').style.color=newRev>baseRev?'var(--red-text)':'var(--green-text)';
+  document.getElementById('scA-sl').style.color=newSl<baseSl?'var(--red-text)':'var(--green-text)';
+
+  const verdict = newSl>baseSl
+    ? `✓ Scenario improves service level by ${newSl-baseSl}%. Stockout drops to ${newStockout}%.`
+    : parseFloat(newStockout)>baseStockout
+    ? `⚠ Scenario increases stockout risk to ${newStockout}%. Review reorder point.`
+    : `→ Neutral scenario. Monitor holding cost at ₹${newHolding}L.`;
+  document.getElementById('scenarioVerdict').textContent=verdict;
+}
+
+// ════════════════════════════════════════════════════
+// LIVE SIMULATION
+// ════════════════════════════════════════════════════
+function toggleSimulation() {
+  simRunning=!simRunning;
+  const btn=document.getElementById('simBtn');
+  if(simRunning){
+    btn.classList.add('active');btn.textContent='⏹ Stop Simulation';
+    document.getElementById('eventLog').innerHTML='';
+    runSimTick();
+    simInterval=setInterval(runSimTick,6000);
+  } else {
+    btn.classList.remove('active');btn.textContent='⚡ Live Simulation';
+    clearInterval(simInterval);
+  }
+}
+function runSimTick() {
+  const ev=SIM_EVENTS[Math.floor(Math.random()*SIM_EVENTS.length)];
+  const now=new Date();
+  const timeStr=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const log=document.getElementById('eventLog');
+  const item=document.createElement('div');
+  item.className='event-item';
+  item.innerHTML=`<span class="event-time">${timeStr}</span><span class="event-dot ev-${ev.type}"></span><span class="event-msg">${ev.msg}</span>`;
+  log.insertBefore(item,log.firstChild);
+  if(currentKpiData&&Math.random()>0.5){
+    const d=ALL_DATA[document.getElementById('regionFilter').value]||ALL_DATA.all;
+    d.kpi.stockout=Math.max(1,Math.min(8,d.kpi.stockout+(Math.random()-0.5)*0.4));
+    d.kpi.otd=Math.max(80,Math.min(99,d.kpi.otd+(Math.random()-0.5)));
+    renderKPIs(d.kpi);
+  }
+}
+
+// ════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════
+function showKpiModal(key) {
+  const m=KPI_META[key], b=BENCHMARKS[key], kpi=currentKpiData;
+  const vals={orders:kpi.orders,turnover:kpi.turnover,stockout:kpi.stockout,otd:kpi.otd,cost:kpi.cost,supplier:kpi.supplier};
+  const v=vals[key];
+  const dispV=key==='orders'?v.toLocaleString():key==='turnover'?v.toFixed(1)+'x':key==='cost'?'₹'+v.toFixed(2)+'Cr':key==='stockout'||key==='otd'?v+'%':v+'/100';
+  const st=kpiStatus(key,v);
+  const color=st==='good'?'var(--green)':st==='warn'?'var(--amber)':'var(--red)';
+  document.getElementById('modalContent').innerHTML=`
+    <span class="modal-close" onclick="closeModal()">✕</span>
+    <h3 style="color:${color};">${m.label} — Detailed View</h3>
+    <div class="modal-sub">${m.tooltip}</div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-item-label">Current</div><div class="detail-item-value" style="color:${color};">${dispV}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Target</div><div class="detail-item-value">${b.target}${b.unit}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Industry Avg</div><div class="detail-item-value">${b.industry}${b.unit}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Status</div><div class="detail-item-value" style="color:${color};font-size:14px;">${st.toUpperCase()}</div></div>
+    </div>
+    <div style="margin-top:14px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--muted);">
+      ${st==='crit'?'⚠ Immediate action required. This KPI is critically below target.':st==='warn'?'⚡ KPI needs attention. At industry average but below internal target.':'✓ Performing well. Continue current strategies.'}
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function showSupplierModal(name) {
+  const s=SUPPLIERS.find(x=>x.name===name);
+  if(!s)return;
+  const alt=SUPPLIERS.find(x=>x.score>s.score+15);
+  const riskColor=s.risk==='Low'?'var(--green)':s.risk==='Med'?'var(--amber)':'var(--red)';
+  const dims=[{label:'Cost Efficiency',val:s.cost},{label:'Lead Time',val:s.leadTime},{label:'Reliability',val:s.reliability},{label:'Quality',val:s.quality}];
+  document.getElementById('modalContent').innerHTML=`
+    <span class="modal-close" onclick="closeModal()">✕</span>
+    <h3>${s.name}</h3>
+    <div class="modal-sub">Rank #${s.rank} · Score: ${s.score}/100 · Risk: <span style="color:${riskColor};font-weight:700;">${s.risk}</span> · Lead time: ${s.leadDays}d · Delay rate: ${s.delayRate}%</div>
+    <div class="detail-grid">
+      ${dims.map(d=>`<div class="detail-item">
+        <div class="detail-item-label">${d.label}</div>
+        <div class="detail-item-value">${d.val}/100</div>
+        <div style="margin-top:6px;height:5px;background:var(--border);border-radius:3px;"><div style="width:${d.val}%;height:100%;background:${d.val>=80?'var(--green)':d.val>=65?'var(--amber)':'var(--red)'};border-radius:3px;"></div></div>
+      </div>`).join('')}
+    </div>
+    ${alt&&s.score<70?`<div style="margin-top:12px;padding:10px;background:var(--green-bg);border:1px solid #86efac;border-radius:8px;font-size:12px;color:var(--green-text);">
+      🔄 <strong>Recommended switch → ${alt.name}</strong><br>
+      Expected savings: ~15–20% cost reduction<br>
+      Lead time improvement: ${s.leadDays-alt.leadDays} days faster<br>
+      Delay rate improvement: ${s.delayRate-alt.delayRate}% fewer delays
+    </div>`:''}
+    <div style="margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--muted);">
+      ${s.score<70?'⚠ Critical: Initiate vendor qualification for replacement immediately.':s.score<80?'⚡ Improvement needed. Schedule performance review.':'✓ Good supplier. Maintain relationship, explore volume discounts.'}
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function showItemModal(itemName) {
+  const a=currentAlerts.find(x=>x.item===itemName);
+  if(!a)return;
+  const score=computePriorityScore(a);
+  const fin=computeFinancialImpact(a);
+  const days=a.avgDemand>0?Math.round(a.stock/a.avgDemand):'—';
+  const rop=Math.round((a.avgDemand*a.leadTimeDays)+a.safetyStock);
+  const atRisk=typeof days==='number'&&days<a.leadTimeDays;
+  document.getElementById('modalContent').innerHTML=`
+    <span class="modal-close" onclick="closeModal()">✕</span>
+    <h3>${a.item}</h3>
+    <div class="modal-sub">${a.wh} · Priority Score: ${score}/100</div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-item-label">Current Stock</div><div class="detail-item-value">${a.stock}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Reorder Point*</div><div class="detail-item-value" style="color:var(--blue);">${rop}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Lead Time</div><div class="detail-item-value" style="color:${atRisk?'var(--red)':'var(--muted)'};">${a.leadTimeDays}d</div></div>
+      <div class="detail-item"><div class="detail-item-label">Survival Days</div><div class="detail-item-value" style="color:${atRisk?'var(--red)':'var(--green)'};">${days}d${atRisk?' ⚠':''}</div></div>
+    </div>
+    ${atRisk?`<div style="margin-top:10px;padding:10px;background:var(--red-bg);border:1px solid #fca5a5;border-radius:8px;font-size:12px;color:var(--red-text);font-weight:700;">
+      ⚠ CRITICAL: Stock will run out in ${days}d but lead time is ${a.leadTimeDays}d — replenishment will arrive LATE.
+    </div>`:''}
+    <div style="margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;">
+      <div style="font-weight:700;margin-bottom:6px;">Financial Impact:</div>
+      <div>Lost Sales: ₹${(fin.lostSales/1000).toFixed(1)}K &nbsp;|&nbsp; Expedite Cost: ₹${(fin.expedite/1000).toFixed(1)}K &nbsp;|&nbsp; <strong>Total Risk: ₹${(fin.total/1000).toFixed(1)}K</strong></div>
+      <div style="margin-top:8px;color:var(--muted);">* ROP = (${a.avgDemand} units/day × ${a.leadTimeDays}d) + ${a.safetyStock} safety stock = ${rop} units</div>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if(!e||e.target===document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════
+// FILTER + INIT
+// ════════════════════════════════════════════════════
+function applyFilter() {
+  const region=document.getElementById('regionFilter').value;
+  const cat=document.getElementById('catFilter').value;
+  const d=ALL_DATA[region]||ALL_DATA.all;
+
+  renderKPIs(d.kpi);
+  renderExecSummary(d,region);
+  generateAIRecs(d,region);
+
+  const invData=(cat!=='all'&&CAT_INVENTORY[cat])?CAT_INVENTORY[cat]:d.inventory;
+  makeInvChart(invData);
+  makeStatusChart(d.orders);
+  makeTrendChart(d.revenue,d.procCost);
+
+  let alerts=d.stockAlerts;
+  if(cat!=='all'){
+    const keys={electronics:['Microcontroller','LCD','HDMI','Transformer'],raw:['Steel','Aluminium','Copper','PVC'],fmcg:['Noodles','Soap','Shampoo'],packaging:['Box','Wrap'],spare:['Bearing','O-Ring']};
+    const kws=keys[cat]||[];
+    const f=alerts.filter(a=>kws.some(k=>a.item.includes(k)));
+    if(f.length>0)alerts=f;
+  }
+  currentAlerts=alerts;
+  renderStockTable(alerts);
+  renderGapAnalysis(alerts);
+  renderTop3(alerts);
+  renderFlowDiagram(alerts);
+}
+
+// ════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════
+applyFilter();
+renderSupplierGrid();
+renderDelayBars();
+makeSupplierChart();
+makeCostChart();
+updateMLChart();
+updateScenario();
 </script>
+</body>
+</html>
